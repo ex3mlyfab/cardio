@@ -1,0 +1,28 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
+
+Route::get('/', function () {
+    return Inertia::render('welcome');
+})->name('home');
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('dashboard', function () {
+        return Inertia::render('dashboard');
+    })->name('dashboard');
+    Route::group(['prefix'=>'patients'],function(){
+        Route::get('/', [\App\Http\Controllers\PatientController::class,'index'])->name('patients.index');
+        Route::get('create',[\App\Http\Controllers\PatientController::class,'create'])->name('patients.create');
+        Route::post('store',[\App\Http\Controllers\PatientController::class,'store'])->name('patients.store');
+        Route::get('{patient}',[\App\Http\Controllers\PatientController::class,'show'])->name('patients.show');
+        Route::get('/showTest/{showTest}',[\App\Http\Controllers\PatientController::class,'showTest'])->name('patients.showTest');
+        Route::get('{patient}/edit',[\App\Http\Controllers\PatientController::class,'edit'])->name('patients.edit');
+        Route::put('{patient}',[\App\Http\Controllers\PatientController::class,'update'])->name('patients.update');
+        Route::delete('{patient}',[\App\Http\Controllers\PatientController::class,'destroy'])->name('patients.destroy');
+        Route::get('{patient}/search', [\App\Http\Controllers\PatientController::class, 'search'])->name('patients.search');
+    });
+});
+
+require __DIR__.'/settings.php';
+require __DIR__.'/auth.php';

@@ -101,9 +101,11 @@ export default function CreatePatientPage() {
 
     const handleHospitalIdBlur: FocusEventHandler<HTMLInputElement> = async () => {
         if (data.hospital_id && data.hospital_id.trim() !== '') {
+            console.log(data.hospital_id);
             try {
                 // Assuming route() is globally available (e.g., from Ziggy)
-                const response = await fetch(route('patient.search', { hospital_id: data.hospital_id }));
+                const response = await fetch(route('patients.search', { patient: data.hospital_id }));
+
                 if (response.ok) {
                     const patientData = await response.json();
                     // Check if patientData is a non-empty object
@@ -251,72 +253,194 @@ export default function CreatePatientPage() {
                                         <TableCell className="border p-2"> {renderInputField('weight', '')}</TableCell>
                                         <TableCell className="border p-2"> {renderInputField('wc_cm', '')}</TableCell>
                                         <TableCell className="border p-2"> {renderInputField('height', '')} {/* Consider using Select/Radio for Gender */}</TableCell>
-                                        <TableCell className="border p-2"> {renderInputField('bsa', '', 'date')}</TableCell>
+                                        <TableCell className="border p-2"> {renderInputField('bsa', '')}</TableCell>
                                         <TableCell className="border p-2">{renderInputField('blood_pressure', '')}</TableCell>
                                     </TableRow>
                                 </TableBody>
                             </Table>
                         </div>
 
-
-                        <div className="flex justify-left mt-1 gap-2 align-middle">
-                                <h2 className="mb-4 text-xl font-semibold">Indication for study:</h2>
-                                {renderInputField('indication', '', 'text', 'Indication for Study')}
+                        <div className="flex justify-evenly mt-1 gap-2 align-center">
+                            <h2 className="text-xl font-semibold mt-2">Indication for study:</h2>
+                            {renderInputField('indication', '', 'text', 'Indication for Study')}
                         </div>
-                        <div>
-                            <h2 className="mb-4 text-xl font-semibold">Dimension</h2>
-                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-                                {renderInputField('aortic_root', 'Aortic Root', 'text', 'Optional')}
-                                {renderInputField('la_ap', 'LA (AP)', 'text', 'Optional')}
-                                {renderInputField('mv_excursion', 'MV Excursion', 'text', 'Optional')}
-                                {renderInputField('ef_slope', 'EF Slope', 'text', 'Optional')}
-                                {renderInputField('epss', 'EPSS', 'text', 'Optional')}
-                                {renderInputField('rvid', 'RVID', 'text', 'Optional')}
-                                {renderInputField('raa', 'RAA', 'text', 'Optional')}
-                                {renderInputField('laa', 'LAA', 'text', 'Optional')}
-                                {renderInputField('ivsd', 'IVSd', 'text', 'Optional')}
-                                {renderInputField('lvidd', 'LVIDd', 'text', 'Optional')}
-                                {renderInputField('lvpwd', 'LVPWd', 'text', 'Optional')}
-                                {renderInputField('ivss', 'IVSs', 'text', 'Optional')}
-                                {renderInputField('lvids', 'LVIDs', 'text', 'Optional')}
-                                {renderInputField('lvpws', 'LVPWs', 'text', 'Optional')}
-                                {renderInputField('fs', 'FS (%)', 'text', 'Optional')}
-                                {renderInputField('ef', 'EF (%)', 'text', 'Optional')}
-                            </div>
-                        </div>
+                        <Table className='border'>
+                           <TableHeader>
+                                <TableRow>
+                                    <TableHead className="border p-2">Dimensions</TableHead>
+                                    <TableHead className="border p-2">Normal</TableHead>
+                                    <TableHead className="border p-2 w-[150px]">Patient Value</TableHead>
+                                    <TableHead className="border p-2"></TableHead>
+                                    <TableHead className="border p-2">Normal</TableHead>
+                                    <TableHead className="border p-2 w-[150px]">Patient Value</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                <TableRow>
+                                    <TableCell className="border p-1"> Aortic Root</TableCell>
+                                    <TableCell className="border p-1"> 20-40 mm</TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('aortic_root', '', 'number', 'Aortic Root')}</TableCell>
+                                    <TableCell className="border p-1"> IVSD(mm)</TableCell>
+                                    <TableCell className="border p-1"> 6 - 11</TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('ivsd', '', 'number', 'IVSD')}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell className="border p-1"> LA(AP)</TableCell>
+                                    <TableCell className="border p-1"> 20-40 mm</TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('la_ap', '', 'number', 'LA (AP)')}</TableCell>
+                                    <TableCell className="border p-1"> LVIDd(mm)</TableCell>
+                                    <TableCell className="border p-1"> 38 - 55</TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('lvidd', '', 'number', 'LVIDd')}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell className="border p-1"> MV Excursion</TableCell>
+                                    <TableCell className="border p-1"> </TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('mv_excursion', '', 'number', 'MV Excursion')}</TableCell>
+                                    <TableCell className="border p-1"> LVPWD(mm)</TableCell>
+                                    <TableCell className="border p-1"> 6 - 11</TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('lvpwd', '', 'number', 'LVIDd')}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell className="border p-1"> EF slope (mm/s)</TableCell>
+                                    <TableCell className="border p-1"> 50-180 </TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('ef_slope', '', 'number', 'EF slope')}</TableCell>
+                                    <TableCell className="border p-1"> IVSs</TableCell>
+                                    <TableCell className="border p-1"> </TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('ivss', '', 'number', 'IVSS')}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell className="border p-1"> EPSS(mm)</TableCell>
+                                    <TableCell className="border p-1"> &le; 10 </TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('epss', '', 'number', 'EPSS')}</TableCell>
+                                    <TableCell className="border p-1"> LVIDs</TableCell>
+                                    <TableCell className="border p-1"> </TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('lvids', '', 'number', 'LVIDs')}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell className="border p-1"> RVID(mm)</TableCell>
+                                    <TableCell className="border p-1"> 27 - 33</TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('rvid', '', 'number', 'RVID')}</TableCell>
+                                    <TableCell className="border p-1"> LVPWs</TableCell>
+                                    <TableCell className="border p-1"> </TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('lvpws', '', 'number', 'LVPWs')}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell className="border p-1"> RAA(cm<sup>2</sup>)</TableCell>
+                                    <TableCell className="border p-1"> 27 - 33</TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('raa', '', 'number', 'RAA')}</TableCell>
+                                    <TableCell className="border p-1"> FS(%)</TableCell>
+                                    <TableCell className="border p-1">25-45 </TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('fs', '', 'number', 'FS')}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell className="border p-1"> LAA(cm<sup>2</sup>)</TableCell>
+                                    <TableCell className="border p-1"> &le; 20</TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('laa', '', 'number', 'LAA')}</TableCell>
+                                    <TableCell className="border p-1"> EF(%)</TableCell>
+                                    <TableCell className="border p-1">&gt; 45 </TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('ef', '', 'number', 'EF')}</TableCell>
+                                </TableRow>
+                           </TableBody>
+                        </Table>
+                        <Table className='mt-1'>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead className="border p-2">Diastolic Function</TableHead>
+                                    <TableHead className="border p-2">Normal</TableHead>
+                                    <TableHead className="border p-2 w-[150px]">Patient Value</TableHead>
+                                    <TableHead className="border p-2"></TableHead>
+                                    <TableHead className="border p-2">Normal</TableHead>
+                                    <TableHead className="border p-2 w-[150px]">Patient Value</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                <TableRow>
+                                    <TableCell className="border p-1"> E Wave (m/s)</TableCell>
+                                    <TableCell className="border p-1"> </TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('e_wave', '', 'number', 'E Wave')}</TableCell>
+                                    <TableCell className="border p-1"> E' (lat)(m/s)</TableCell>
+                                    <TableCell className="border p-1"></TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('e_lat', '', 'number', '')}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell className="border p-1"> A Wave(m/s)</TableCell>
+                                    <TableCell className="border p-1"> </TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('a_wave', '', 'number', '')}</TableCell>
+                                    <TableCell className="border p-1"> A'(lat)(m/s)</TableCell>
+                                    <TableCell className="border p-1"> </TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('a_lat', '', 'number', '')}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell className="border p-1"> E/A</TableCell>
+                                    <TableCell className="border p-1"> </TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('e_a', '', 'number', '')}</TableCell>
+                                    <TableCell className="border p-1"> S' (lat)(m/s)</TableCell>
+                                    <TableCell className="border p-1"> </TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('s_lat', '', 'number', '')}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell className="border p-1"> E wave DT(m/s)</TableCell>
+                                    <TableCell className="border p-1"> </TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('e_wave_dt', '', 'number', '')}</TableCell>
+                                    <TableCell className="border p-1"> E/E'</TableCell>
+                                    <TableCell className="border p-1"> &le;15</TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('e_e', '', 'number', '')}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell className="border p-1"> IVRT(m/s)</TableCell>
+                                    <TableCell className="border p-1"> </TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('ivrt', '', 'number', '')}</TableCell>
+                                    <TableCell className="border p-1"> </TableCell>
+                                    <TableCell className="border p-1"> </TableCell>
+                                    <TableCell className="border p-1"> </TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                        <Table className='mt-1'>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead className="border p-2">Doppler Measurements</TableHead>
+                                    <TableHead className="border p-2">Normal</TableHead>
+                                    <TableHead className="border p-2 w-[150px]">Patient Value</TableHead>
+                                    <TableHead className="border p-2"></TableHead>
+                                    <TableHead className="border p-2">Normal</TableHead>
+                                    <TableHead className="border p-2 w-[150px]">Patient Value</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                <TableRow>
+                                    <TableCell className="border p-1"> Aortic Valve(Peak vel)</TableCell>
+                                    <TableCell className="border p-1"> </TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('aortic_valve_peak', '', 'number', '')}</TableCell>
+                                    <TableCell className="border p-1"> Pulmonary valve (Peak vel)</TableCell>
+                                    <TableCell className="border p-1"> </TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('pulmonary_valve_peak', '', 'number', '')}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell className="border p-1"> Aortic valve (pressure gradient)</TableCell>
+                                    <TableCell className="border p-1"> </TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('aortic_valve_press', '', 'number', '')}</TableCell>
+                                    <TableCell className="border p-1"> Pulmonary valve (pressure gradient)</TableCell>
+                                    <TableCell className="border p-1"> </TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('pulmonary_valve_press', '', 'number', '')}</TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+
 
                         <div>
-                            <h2 className="mb-4 text-xl font-semibold">Diastolic Function</h2>
-                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-                                {renderInputField('e_wave', 'E Wave', 'text', 'Optional')}
-                                {renderInputField('a_wave', 'A Wave', 'text', 'Optional')}
-                                {renderInputField('e_a', 'E/A Ratio', 'text', 'Optional')}
-                                {renderInputField('e_wave_dt', 'E Wave DT', 'text', 'Optional')}
-                                {renderInputField('e_lat', "E' (Lat)", 'text', 'Optional')}
-                                {renderInputField('a_lat', "A' (Lat)", 'text', 'Optional')}
-                                {renderInputField('s_lat', "S' (Lat)", 'text', 'Optional')}
-                                {renderInputField('e_e', "E/E'", 'text', 'Optional')}
-                                {renderInputField('ivrt', 'IVRT', 'text', 'Optional')}
-                            </div>
-                        </div>
 
-                        <div>
-                            <h2 className="mb-4 text-xl font-semibold">Doppler Measurements</h2>
-                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                                {renderInputField('aortic_valve_peak', 'Aortic Valve Peak Vel', 'text', 'Optional')}
-                                {renderInputField('aortic_valve_press', 'Aortic Valve Press Grad', 'text', 'Optional')}
-                                {renderInputField('pulmonary_valve_peak', 'Pulmonary Valve Peak Vel', 'text', 'Optional')}
-                                {renderInputField('pulmonary_valve_press', 'Pulmonary Valve Press Grad', 'text', 'Optional')}
-                                {renderInputField('triscupid_regurg_peak', 'Triscupid Regurg Peak Vel', 'text', 'Optional')}
-                                {renderInputField('triscupid_regurg_press', 'Triscupid Regurg Press Grad', 'text', 'Optional')}
-                                {renderInputField('mitral_regurg_peak', 'Mitral Regurg Peak Vel', 'text', 'Optional')}
-                                {renderInputField('mitral_regurg_press', 'Mitral Regurg Press Grad', 'text', 'Optional')}
-                                {renderInputField('aortic_regurg_peak', 'Aortic Regurg Peak Vel', 'text', 'Optional')}
-                                {renderInputField('aortic_regurg_press', 'Aortic Regurg Press Grad', 'text', 'Optional')}
-                                {renderInputField('mitral_stenosis', 'Mitral Stenosis', 'text', 'Optional')}
-                                {renderInputField('inferior_vena_cava_insp', 'Inferior Vena Cava (Insp)', 'text', 'Optional')}
-                                {renderInputField('inferior_vena_cava_expi', 'Inferior Vena Cava (Expi)', 'text', 'Optional')}
-                                {renderInputField('inferior_vena_cava_diam', 'Inferior Vena Cava Diam', 'text', 'Optional')}
+                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                {renderInputField('triscupid_regurg_peak', 'Triscupid Regurgitation (Peak Velocity)', 'text', 'Optional')}
+                                {renderInputField('triscupid_regurg_press', 'Triscupid Regurgitation (Peak pressure gradient)', 'text', 'Optional')}
+                                {renderInputField('mitral_regurg_peak', 'Mitral Regurgitation (Peak Velocity)', 'text', 'Optional')}
+                                {renderInputField('mitral_regurg_press', 'Mitral Regurgitation (Pressure Gradient)', 'text', 'Optional')}
+                                {renderInputField('aortic_regurg_peak', 'Aortic Regurgitation (Peak Velocity)', 'text', 'Optional')}
+                                {renderInputField('aortic_regurg_press', 'Aortic Regurgitation (Pressure Gradient)', 'text', 'Optional')}
+                                {renderInputField('mitral_stenosis', 'Mitral Stenosis(Valve Area) ', 'text', 'Optional')}
+                                {renderInputField('inferior_vena_cava_insp', 'Inferior Vena Cava (Diameter in Inspiration)', 'text', 'Optional')}
+                                {renderInputField('inferior_vena_cava_expi', 'Inferior Vena Cava (Diameter in Expiration)', 'text', 'Optional')}
+                                {renderInputField('inferior_vena_cava_diam', 'Inferior Vena Cava (Diameter with valsalva manoeuvre)', 'text', 'Optional')}
                                 {renderInputField('est_right', 'Est. Right Atrial Pressure', 'text', 'Optional')}
                             </div>
                         </div>
@@ -327,6 +451,9 @@ export default function CreatePatientPage() {
                                 {renderInputField('pericardium', 'Pericardium', 'text', 'Optional')}
                                 {renderTextareaField('summary', 'Summary', 'Optional')}
                                 {renderTextareaField('conclusion', 'Conclusion', 'Optional')}
+
+                            </div>
+                            <div className="mt-3">
                                 {renderInputField('sign', 'Sign (Doctor)', 'text', 'Optional')}
                             </div>
                         </div>

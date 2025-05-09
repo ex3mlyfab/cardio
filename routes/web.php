@@ -20,7 +20,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('{patient}/edit',[\App\Http\Controllers\PatientController::class,'edit'])->name('patients.edit');
         Route::put('{patient}',[\App\Http\Controllers\PatientController::class,'update'])->name('patients.update');
         Route::delete('{patient}',[\App\Http\Controllers\PatientController::class,'destroy'])->name('patients.destroy');
-        Route::get('{patient}/search', [\App\Http\Controllers\PatientController::class, 'search'])->name('patients.search');
+        Route::get('{patient}/search', [\App\Http\Controllers\PatientController::class, 'searchPatient'])->name('patients.search');
     });
 });
 

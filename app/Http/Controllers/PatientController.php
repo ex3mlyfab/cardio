@@ -29,7 +29,10 @@ class PatientController extends Controller
             ]
         ]);
     }
-
+    public function listTests()
+    {
+        
+    }
     public function create()
     {
         return Inertia::render('patients/create');
@@ -176,7 +179,8 @@ class PatientController extends Controller
         // e.g., TestRecord::create(array_merge($validated, ['user_id' => auth()->id()]));
 
         // Redirect or return response
-        return redirect()->route('patients.index')->with('success', 'Test record created successfully');
+        return response(['success' => 'Test record created successfully',
+        'testRecord' => $testRecord,]);
     }
     public function show(Patient $patient)
     {
@@ -189,7 +193,7 @@ class PatientController extends Controller
     public function showTest(TestRecord $testRecord)
     {
         return Inertia::render('patients/showTest', [
-            'test' => $testRecord,
+            'data' => $testRecord,
         ]);
     }
     Public function edit(Patient $patient)
@@ -198,9 +202,78 @@ class PatientController extends Controller
             'patient' => $patient,
         ]);
     }
+    public function editTestRecord(TestRecord $testRecord)
+    {
+        return Inertia::render('patients/editTestRecord', [
+            'data' => $testRecord,
+        ]);
+    }
+    public function updateTestRecord(Request $request, TestRecord $testRecord)
+    {
+        $validated = $request->validate([
+            'test_date' => 'required|date',
+            'weight' => 'required|numeric',
+            'height' => 'required|numeric',
+            'bsa' => 'required|numeric',
+            'blood_pressure' => 'required|string|max:255',
+            'wc_cm' => 'nullable|numeric',
+            'indication' => 'required|string|max:255',
+            // Dimension
+            'aortic_root' => 'nullable|numeric',
+            'la_ap' => 'nullable|numeric',
+            'mv_excursion' => 'nullable|numeric',
+            'ef_slope' => 'nullable|numeric',
+            'epss' => 'nullable|numeric',
+            'rvid' => 'nullable|numeric',
+            'raa' => 'nullable|numeric',
+            'laa' => 'nullable|numeric',
+            'ivsd' => 'nullable|numeric',
+            'lvidd' => 'nullable|numeric',
+            'lvpwd' => 'nullable|numeric',
+            'ivss' => 'nullable|numeric',
+            'lvids' => 'nullable|numeric',
+            'lvpws' => 'nullable|numeric',
+            'fs' => 'nullable|numeric',
+            'ef' => 'nullable|numeric',
+            // Diastolic function
+            'e_wave' => 'nullable|numeric',
+            'a_wave' => 'nullable|numeric',
+            'e_a' => 'nullable|numeric',
+            'e_wave_dt' => 'nullable|numeric',
+            'e_lat' => 'nullable|numeric',
+            'a_lat' => 'nullable|numeric',
+            's_lat' => 'nullable|numeric',
+            'e_e' => 'nullable|numeric',
+            'ivrt' => 'nullable|numeric',
+            // Doppler measurements
+            'aortic_valve_peak' => 'nullable|numeric',
+            'aortic_valve_press' => 'nullable|numeric',
+            'pulmonary_valve_press' => 'nullable|numeric',
+            'pulmonary_valve_peak' => 'nullable|numeric',
+            'triscupid_regurg_peak' => 'nullable|string|max:255',
+            'triscupid_regurg_press' => 'nullable|string|max:255',
+            'mitral_regurg_peak' => 'nullable|string|max:255',
+            'mitral_regurg_press' => 'nullable|string|max:255',
+            'aortic_regurg_peak' => 'nullable|string|max:255',
+            'aortic_regurg_press' => 'nullable|string|max:255',
+            'mitral_stenosis' => 'nullable|string|max:255',
+            'inferior_vena_cava_insp' => 'nullable|string|max:255',
+            'inferior_vena_cava_expi' => 'nullable|string|max:255',
+            'inferior_vena_cava_diam' => 'nullable|string|max:255',
+            'est_right' => 'nullable|string|max:255',
+            'pericardium' => 'nullable|string|max:255',
+            'summary' => 'nullable|string',
+            'conclusion' => 'nullable|string',
+            'sign' => 'nullable|string|max:255',
+        ]);
+
+        $testRecord->update($validated);
+
+        return redirect()->route('patients.showTest', $testRecord->id)->with('success', 'Test record updated successfully');
+    }
     public function update(Request $request, Patient $patient)
     {
-        // 
+        //
     }
     public function destroy(Patient $patient)
     {

@@ -1,16 +1,14 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('welcome');
-})->name('home');
+Route::get('/',  [AuthenticatedSessionController::class, 'create'])->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    Route::get('dashboard',[DashboardController::class, 'index'])->name('dashboard');
     Route::group(['prefix'=>'patients'],function(){
         Route::get('/', [\App\Http\Controllers\PatientController::class,'index'])->name('patients.index');
         Route::get('create',[\App\Http\Controllers\PatientController::class,'create'])->name('patients.create');
@@ -21,6 +19,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('{patient}',[\App\Http\Controllers\PatientController::class,'update'])->name('patients.update');
         Route::delete('{patient}',[\App\Http\Controllers\PatientController::class,'destroy'])->name('patients.destroy');
         Route::get('{patient}/search', [\App\Http\Controllers\PatientController::class, 'searchPatient'])->name('patients.search');
+        Route::get('test-records/{testRecord}', [\App\Http\Controllers\PatientController::class,'showTest'])->name('patients.showTestRecord');
     });
 });
 

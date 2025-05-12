@@ -6,7 +6,7 @@ import { FormEventHandler, FocusEventHandler } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea'; // Assuming this component exists
+import { Textarea } from '@/components/ui/textarea';
 import InputError from '@/components/input-error';
 import {
     Table,
@@ -20,143 +20,150 @@ import {
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Create Patient',
-        href: '/patients/create',
+        title: 'Patients',
+        href: '/patients',
+    },
+    {
+        title: 'Edit Test Record',
+        href: '#',
     },
 ];
 
-export default function CreatePatientPage() {
-    const { data, setData, post, processing, errors, reset } = useForm({
+export default function EditTestRecordPage({ data: testRecord }: { data: {
+    id: number;
+    patient?: {
+        surname: string;
+        other_names: string;
+        gender: string;
+        hospital_id: string;
+        date_of_birth: string;
+        nicl: string;
+    };
+    test_date: string;
+    weight: string;
+    height: string;
+    bsa: string;
+    blood_pressure: string;
+    wc_cm: string;
+    indication: string;
+    aortic_root: string;
+    la_ap: string;
+    mv_excursion: string;
+    ef_slope: string;
+    epss: string;
+    rvid: string;
+    raa: string;
+    laa: string;
+    ivsd: string;
+    lvidd: string;
+    lvpwd: string;
+    ivss: string;
+    lvids: string;
+    lvpws: string;
+    fs: string;
+    ef: string;
+    e_wave: string;
+    a_wave: string;
+    e_a: string;
+    e_wave_dt: string;
+    e_lat: string;
+    a_lat: string;
+    s_lat: string;
+    e_e: string;
+    ivrt: string;
+    aortic_valve_peak: string;
+    aortic_valve_press: string;
+    pulmonary_valve_press: string;
+    pulmonary_valve_peak: string;
+    triscupid_regurg_peak: string;
+    triscupid_regurg_press: string;
+    mitral_regurg_peak: string;
+    mitral_regurg_press: string;
+    aortic_regurg_peak: string;
+    aortic_regurg_press: string;
+    mitral_stenosis: string;
+    inferior_vena_cava_insp: string;
+    inferior_vena_cava_expi: string;
+    inferior_vena_cava_diam: string;
+    est_right: string;
+    pericardium: string;
+    summary: string;
+    conclusion: string;
+    sign: string;
+}}) {
+    const { data, setData, put, processing, errors } = useForm({
         // Patient fields
-        surname: '',
-        other_names: '',
-        gender: '',
-        hospital_id: '',
-        date_of_birth: '',
-        nicl: '',
+        surname: testRecord.patient?.surname || '',
+        other_names: testRecord.patient?.other_names || '',
+        gender: testRecord.patient?.gender || '',
+        hospital_id: testRecord.patient?.hospital_id || '',
+        date_of_birth: testRecord.patient?.date_of_birth || '',
+        nicl: testRecord.patient?.nicl || '',
         // Test Record fields
-        test_date: '',
-        weight: '',
-        height: '',
-        bsa: '',
-        blood_pressure: '',
-        wc_cm: '',
-        indication: '',
+        test_date: testRecord.test_date || '',
+        weight: testRecord.weight || '',
+        height: testRecord.height || '',
+        bsa: testRecord.bsa || '',
+        blood_pressure: testRecord.blood_pressure || '',
+        wc_cm: testRecord.wc_cm || '',
+        indication: testRecord.indication || '',
         // Dimension
-        aortic_root: '',
-        la_ap: '',
-        mv_excursion: '',
-        ef_slope: '',
-        epss: '',
-        rvid: '',
-        raa: '',
-        laa: '',
-        ivsd: '',
-        lvidd: '',
-        lvpwd: '',
-        ivss: '',
-        lvids: '',
-        lvpws: '',
-        fs: '',
-        ef: '',
+        aortic_root: testRecord.aortic_root || '',
+        la_ap: testRecord.la_ap || '',
+        mv_excursion: testRecord.mv_excursion || '',
+        ef_slope: testRecord.ef_slope || '',
+        epss: testRecord.epss || '',
+        rvid: testRecord.rvid || '',
+        raa: testRecord.raa || '',
+        laa: testRecord.laa || '',
+        ivsd: testRecord.ivsd || '',
+        lvidd: testRecord.lvidd || '',
+        lvpwd: testRecord.lvpwd || '',
+        ivss: testRecord.ivss || '',
+        lvids: testRecord.lvids || '',
+        lvpws: testRecord.lvpws || '',
+        fs: testRecord.fs || '',
+        ef: testRecord.ef || '',
         // Diastolic function
-        e_wave: '',
-        a_wave: '',
-        e_a: '',
-        e_wave_dt: '',
-        e_lat: '',
-        a_lat: '',
-        s_lat: '',
-        e_e: '',
-        ivrt: '',
+        e_wave: testRecord.e_wave || '',
+        a_wave: testRecord.a_wave || '',
+        e_a: testRecord.e_a || '',
+        e_wave_dt: testRecord.e_wave_dt || '',
+        e_lat: testRecord.e_lat || '',
+        a_lat: testRecord.a_lat || '',
+        s_lat: testRecord.s_lat || '',
+        e_e: testRecord.e_e || '',
+        ivrt: testRecord.ivrt || '',
         // Doppler measurements
-        aortic_valve_peak: '',
-        aortic_valve_press: '',
-        pulmonary_valve_press: '',
-        pulmonary_valve_peak: '',
-        triscupid_regurg_peak: '',
-        triscupid_regurg_press: '',
-        mitral_regurg_peak: '',
-        mitral_regurg_press: '',
-        aortic_regurg_peak: '',
-        aortic_regurg_press: '',
-        mitral_stenosis: '',
-        inferior_vena_cava_insp: '',
-        inferior_vena_cava_expi: '',
-        inferior_vena_cava_diam: '',
-        est_right: '',
-        pericardium: '',
-        summary: '',
-        conclusion: '',
-        sign: '',
+        aortic_valve_peak: testRecord.aortic_valve_peak || '',
+        aortic_valve_press: testRecord.aortic_valve_press || '',
+        pulmonary_valve_press: testRecord.pulmonary_valve_press || '',
+        pulmonary_valve_peak: testRecord.pulmonary_valve_peak || '',
+        triscupid_regurg_peak: testRecord.triscupid_regurg_peak || '',
+        triscupid_regurg_press: testRecord.triscupid_regurg_press || '',
+        mitral_regurg_peak: testRecord.mitral_regurg_peak || '',
+        mitral_regurg_press: testRecord.mitral_regurg_press || '',
+        aortic_regurg_peak: testRecord.aortic_regurg_peak || '',
+        aortic_regurg_press: testRecord.aortic_regurg_press || '',
+        mitral_stenosis: testRecord.mitral_stenosis || '',
+        inferior_vena_cava_insp: testRecord.inferior_vena_cava_insp || '',
+        inferior_vena_cava_expi: testRecord.inferior_vena_cava_expi || '',
+        inferior_vena_cava_diam: testRecord.inferior_vena_cava_diam || '',
+        est_right: testRecord.est_right || '',
+        pericardium: testRecord.pericardium || '',
+        summary: testRecord.summary || '',
+        conclusion: testRecord.conclusion || '',
+        sign: testRecord.sign || '',
     });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        // You'll need to define this route in your Laravel backend
-        post(route('patients.store'), {
-            onSuccess: () => reset(),
+        put(route('patients.updateTestRecord', testRecord.id), {
+            onSuccess: () => {
+                // Redirect to the patient's test record page
+                window.location.href = route('patients.showTest', testRecord.id);
+            },
         });
-    };
-
-    const handleHospitalIdBlur: FocusEventHandler<HTMLInputElement> = async () => {
-        if (data.hospital_id && data.hospital_id.trim() !== '') {
-            console.log(data.hospital_id);
-            try {
-                // Assuming route() is globally available (e.g., from Ziggy)
-                const response = await fetch(route('patients.search', { patient: data.hospital_id }));
-
-                if (response.ok) {
-                    const patientData = await response.json();
-                    // Check if patientData is a non-empty object
-                    if (patientData && typeof patientData === 'object' && Object.keys(patientData).length > 0) {
-                        setData(currentData => ({
-                            ...currentData,
-                            surname: patientData.surname || '',
-                            other_names: patientData.other_names || '',
-                            gender: patientData.gender || '',
-                            date_of_birth: patientData.date_of_birth || '',
-                        }));
-                    } else {
-                        // Patient not found or empty response, clear fields
-                        setData(currentData => ({
-                            ...currentData,
-                            surname: '',
-                            other_names: '',
-                            gender: '',
-                            date_of_birth: '',
-                        }));
-                    }
-                } else {
-                    // Handle non-OK responses (e.g., 404 Not Found means patient doesn't exist)
-                    setData(currentData => ({
-                        ...currentData,
-                        surname: '',
-                        other_names: '',
-                        gender: '',
-                        date_of_birth: '',
-                    }));
-                }
-            } catch (error) {
-                console.error('Error fetching patient data:', error);
-                setData(currentData => ({
-                    ...currentData,
-                    surname: '',
-                    other_names: '',
-                    gender: '',
-                    date_of_birth: '',
-                }));
-            }
-        } else {
-            // If hospital_id is empty or only whitespace, clear the dependent fields
-            setData(currentData => ({
-                ...currentData,
-                surname: '',
-                other_names: '',
-                gender: '',
-                date_of_birth: '',
-            }));
-        }
     };
 
     const renderInputField = (
@@ -203,7 +210,7 @@ export default function CreatePatientPage() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Create Patient and Test Record" />
+            <Head title="Edit Test Record" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
 
                 {/* Form Container */}
@@ -225,12 +232,11 @@ export default function CreatePatientPage() {
                                 <TableBody>
                                     <TableRow>
                                         <TableCell className="border p-2"> {renderInputField('hospital_id', '', 'text', 'Hospital Id', {
-                                            autoFocus: true,
-                                            onBlur: handleHospitalIdBlur,
+                                            autoFocus: false,
                                         })}</TableCell>
                                         <TableCell className="border p-2"> {renderInputField('surname', '', 'text', 'Surname')}</TableCell>
                                         <TableCell className="border p-2"> {renderInputField('other_names', '')}</TableCell>
-                                        <TableCell className="border p-2"> {renderInputField('gender', '')} {/* Consider using Select/Radio for Gender */}</TableCell>
+                                        <TableCell className="border p-2"> {renderInputField('gender', '')} </TableCell>
                                         <TableCell className="border p-2"> {renderInputField('date_of_birth', '', 'date')}</TableCell>
                                         <TableCell className="border p-2">{renderInputField('nicl', '')}</TableCell>
                                     </TableRow>
@@ -252,7 +258,7 @@ export default function CreatePatientPage() {
                                         </TableCell>
                                         <TableCell className="border p-2"> {renderInputField('weight', '')}</TableCell>
                                         <TableCell className="border p-2"> {renderInputField('wc_cm', '')}</TableCell>
-                                        <TableCell className="border p-2"> {renderInputField('height', '')} {/* Consider using Select/Radio for Gender */}</TableCell>
+                                        <TableCell className="border p-2"> {renderInputField('height', '')} </TableCell>
                                         <TableCell className="border p-2"> {renderInputField('bsa', '')}</TableCell>
                                         <TableCell className="border p-2">{renderInputField('blood_pressure', '')}</TableCell>
                                     </TableRow>
@@ -457,10 +463,12 @@ export default function CreatePatientPage() {
                                 {renderInputField('sign', 'Sign (Doctor)', 'text', 'Optional')}
                             </div>
                         </div>
-
-                        <div className="flex items-center gap-4 pt-4">
+                        <div className="flex justify-end space-x-2">
+                            <Button type="button" variant="outline" onClick={() => window.history.back()}>
+                                Cancel
+                            </Button>
                             <Button type="submit" disabled={processing}>
-                                {processing ? 'Saving...' : 'Save Patient and Test Record'}
+                                Update Test Record
                             </Button>
                         </div>
                     </form>

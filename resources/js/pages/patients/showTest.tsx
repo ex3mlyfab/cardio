@@ -10,6 +10,9 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Printer } from "lucide-react";
+import { useCallback } from "react";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -85,10 +88,101 @@ export default function ShowTest({ patient, testRecord }: {
         conclusion:string;
     }
 }) {
+    // Add print functionality
+    const handlePrint = useCallback(() => {
+        const printContents = document.getElementById('testRecord')?.innerHTML;
+
+        if (printContents) {
+            // Create a new window with only the test record content
+            const printWindow = window.open('', '_blank');
+            if (printWindow) {
+                printWindow.document.open();
+
+                // Create HTML structure using DOM methods instead of document.write
+                const html = printWindow.document.createElement('html');
+
+                const head = printWindow.document.createElement('head');
+                const title = printWindow.document.createElement('title');
+                title.textContent = `Test Record - ${patient.surname} ${patient.other_names}`;
+
+                const style = printWindow.document.createElement('style');
+                style.textContent = `
+                    body { font-family: Arial, sans-serif; }
+                    table { width: 100%; border-collapse: collapse; }
+                    th, td { border: 1px solid #ddd; padding: 8px; }
+                    th { background-color: #f2f2f2; }
+                    h2, h3 { margin-top: 20px; }
+                    @media print {
+                        button { display: none; }
+                    }
+                `;
+
+                head.appendChild(title);
+                head.appendChild(style);
+
+                const body = printWindow.document.createElement('body');
+
+                const container = printWindow.document.createElement('div');
+
+                const heading = printWindow.document.createElement('h1');
+                heading.textContent = `Test Record - ${patient.surname} ${patient.other_names}`;
+
+                const content = printWindow.document.createElement('div');
+                content.innerHTML = printContents;
+
+                const buttonContainer = printWindow.document.createElement('div');
+                buttonContainer.style.textAlign = 'center';
+                buttonContainer.style.marginTop = '30px';
+
+                const printButton = printWindow.document.createElement('button');
+                printButton.textContent = 'Print';
+                printButton.onclick = () => {
+                    printWindow.print();
+                    printWindow.close();
+                };
+
+                buttonContainer.appendChild(printButton);
+
+                container.appendChild(heading);
+                container.appendChild(content);
+                container.appendChild(buttonContainer);
+
+                body.appendChild(container);
+
+                html.appendChild(head);
+                html.appendChild(body);
+
+                printWindow.document.body = body;
+while (printWindow.document.head.firstChild) {
+    printWindow.document.head.removeChild(printWindow.document.head.firstChild);
+}
+Array.from(head.children).forEach(child => {
+    printWindow.document.head.appendChild(child);
+});
+while (printWindow.document.documentElement.firstChild) {
+    printWindow.document.documentElement.removeChild(printWindow.document.documentElement.firstChild);
+}
+printWindow.document.documentElement.appendChild(head);
+printWindow.document.documentElement.appendChild(body);
+
+                printWindow.document.close();
+            }
+        }
+    }, [patient]);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Test Record Details" />
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+            <div className="flex justify-end mb-4">
+                <Button
+                    onClick={handlePrint}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                    <Printer className="h-4 w-4 mr-2" />
+                    Print Test Record
+                </Button>
+            </div>
+            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4" id='testRecord'>
 
                 {/* Form Container */}
                 <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl border p-4 md:p-6">

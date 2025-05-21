@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Patient;
 use App\Models\TestRecord;
+use Illuminate\Container\Attributes\Auth;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -29,10 +31,7 @@ class PatientController extends Controller
             ]
         ]);
     }
-    public function listTests()
-    {
-        
-    }
+
     public function create()
     {
         return Inertia::render('patients/create');
@@ -46,6 +45,7 @@ class PatientController extends Controller
 
     public function store(Request $request)
     {
+        //  dd(auth()->id());
         // Assuming user_id will be set automatically, e.g., auth()->id()
         $validated = $request->validate([
             'hospital_id' => 'required|string|max:255',
@@ -102,15 +102,19 @@ class PatientController extends Controller
             'mitral_stenosis' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
             'inferior_vena_cava_insp' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
             'inferior_vena_cava_expi' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'inferior_vena_cava_diam' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
+            'inferior_vena_cava_diam' => 'nullable|numeric|max:255',
+            // Consider 'numeric' if applicable
+            'pasp' => 'nullable|numeric',
+            'mpap'  => 'nullable|numeric',
+            'mvsp' => 'nullable|numeric',
             'est_right' => 'nullable|numeric|max:255',
-            'pericardium' => 'nullable|numeric|max:255',
+            'pericardium' => 'nullable|string|max:255',
             'summary' => 'nullable|string', // Text fields might not need max length
             'conclusion' => 'nullable|string', // Text fields might not need max length
             'sign' => 'nullable|string|max:255',
         ]);
         $patient = Patient::firstOrCreate([
-            'hospital_id' => $validated['hospital_id'],
+            'hospital_id' => $validated['hospital_id']],[
             'surname' => $validated['surname'],
             'other_names' => $validated['other_names'],
             'date_of_birth' => $validated['date_of_birth'],
@@ -127,8 +131,7 @@ class PatientController extends Controller
             'blood_pressure' => $validated['blood_pressure'],
             'wc_cm' => $validated['wc_cm'],
             'indication' => $validated['indication'],
-            // Dimension
-            'aortic_root' => $validated['aortic_root'],
+             'aortic_root' => $validated['aortic_root'],
             'la_ap' => $validated['la_ap'], // Consider 'numeric' if applicable
             'mv_excursion' => $validated['mv_excursion'], // Consider 'numeric' if applicable
             'ef_slope' => $validated['ef_slope'], // Consider 'numeric' if applicable
@@ -169,31 +172,43 @@ class PatientController extends Controller
             'inferior_vena_cava_insp' => $validated['inferior_vena_cava_insp'], // Consider 'numeric' if applicable
             'inferior_vena_cava_expi' => $validated['inferior_vena_cava_expi'], // Consider 'numeric' if applicable
             'inferior_vena_cava_diam' => $validated['inferior_vena_cava_diam'], // Consider 'numeric' if applicable
+            'pasp' => $validated['pasp'],
+            'mpap' => $validated['mpap'],
+            'mvsp' => $validated['mvsp'],
             'est_right' => $validated['est_right'],
             'pericardium' => $validated['pericardium'],
             'summary' => $validated['summary'],
             'conclusion' => $validated['conclusion'],
             'sign' => $validated['sign'],
         ]);
+
         // Add logic to create the TestRecord using $validated data + user_id
         // e.g., TestRecord::create(array_merge($validated, ['user_id' => auth()->id()]));
 
         // Redirect or return response
-        return response(['success' => 'Test record created successfully',
-        'testRecord' => $testRecord,]);
+       return response()->json([
+        'id' => $testRecord->id,
+        'success' => 'Added successfully'
+       ]);
     }
+
     public function show(Patient $patient)
     {
         return Inertia::render('patients/show', [
             'patient' => $patient,
-            'tests' => $patient->testRecords()->paginate(10),
+            'tests' => $patient->testRecords,
         ]);
     }
 
     public function showTest(TestRecord $testRecord)
     {
+        // dd($testRecord->id);
+
+        $testRecord->load('patient');
+        // dd($testRecord);
+
         return Inertia::render('patients/showTest', [
-            'data' => $testRecord,
+            'testRecord' => $testRecord,
         ]);
     }
     Public function edit(Patient $patient)
@@ -260,6 +275,9 @@ class PatientController extends Controller
             'inferior_vena_cava_insp' => 'nullable|string|max:255',
             'inferior_vena_cava_expi' => 'nullable|string|max:255',
             'inferior_vena_cava_diam' => 'nullable|string|max:255',
+            'pasp' => 'nullable|numeric',
+            'mpap'  => 'nullable|numeric',
+            'mvsp' => 'nullable|numeric',
             'est_right' => 'nullable|string|max:255',
             'pericardium' => 'nullable|string|max:255',
             'summary' => 'nullable|string',

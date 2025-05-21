@@ -36,7 +36,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     }
 ];
 
-export default function PatientDetails({ patient, testRecords }: {
+export default function PatientDetails({ patient, tests }: {
     patient: {
         hospital_id: string;
         surname: string;
@@ -45,7 +45,7 @@ export default function PatientDetails({ patient, testRecords }: {
         date_of_birth: string;
         nicl: string;
     },
-    testRecords: Array<{
+    tests: Array<{
         id: number;
         test_date: string;
         weight: number;
@@ -97,7 +97,7 @@ export default function PatientDetails({ patient, testRecords }: {
                 <div className="mt-6">
                     <h2 className="text-2xl font-semibold mb-4">Test Records</h2>
 
-                    {testRecords.length === 0 ? (
+                    {tests.length === 0 ? (
                         <Card className="shadow-md">
                             <CardContent className="p-6">
                                 <p className="text-center text-gray-500">No test records found for this patient.</p>
@@ -110,7 +110,7 @@ export default function PatientDetails({ patient, testRecords }: {
                         </Card>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {testRecords.map((record, index) => (
+                            {tests.map((record, index) => (
                                 <Card key={record.id || index} className="shadow-md hover:shadow-lg transition-shadow">
                                     <CardHeader>
                                         <CardTitle className="flex items-center justify-between">
@@ -150,7 +150,7 @@ export default function PatientDetails({ patient, testRecords }: {
                                     </CardContent>
                                     <CardFooter className="flex justify-end">
                                         <Button variant="outline" size="sm" asChild>
-                                            <Link href={`/patients/${patient.hospital_id}/tests/${record.id}`}>
+                                            <Link href={`/patients/showTest/${record.id}`}>
                                                 <FileText className="h-4 w-4 mr-1" />
                                                 View Details
                                             </Link>

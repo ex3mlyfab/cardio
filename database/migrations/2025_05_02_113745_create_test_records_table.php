@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('weight');
             $table->string('height');
             $table->string('bsa');
-            $table->string('blood_pressure');
+            $table->string('blood_pressure')->nullable();
             $table->string('wc_cm')->nullable();
             $table->string('indication');
             //Dimension
@@ -67,6 +67,9 @@ return new class extends Migration
             $table->string('inferior_vena_cava_diam')->nullable();
             $table->string('est_right')->nullable();
             $table->string('pericardium')->nullable();
+            $table->string('pasp')->nullable();
+            $table->string('mpap')->nullable();
+            $table->string('mvsp')->nullable();
             $table->string('summary')->nullable();
             $table->string('conclusion')->nullable();
             $table->string('sign')->nullable();

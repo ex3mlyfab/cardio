@@ -16,7 +16,15 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import {
+    Select,
+    SelectContent,
 
+    SelectItem,
+
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -26,7 +34,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function CreatePatientPage() {
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const { data, setData, post, processing, errors } = useForm({
         // Patient fields
         surname: '',
         other_names: '',
@@ -69,6 +77,7 @@ export default function CreatePatientPage() {
         s_lat: '',
         e_e: '',
         ivrt: '',
+
         // Doppler measurements
         aortic_valve_peak: '',
         aortic_valve_press: '',
@@ -84,6 +93,9 @@ export default function CreatePatientPage() {
         inferior_vena_cava_insp: '',
         inferior_vena_cava_expi: '',
         inferior_vena_cava_diam: '',
+        pasp: '',
+        mpap: '',
+        mvsp:'',
         est_right: '',
         pericardium: '',
         summary: '',
@@ -95,7 +107,11 @@ export default function CreatePatientPage() {
         e.preventDefault();
         // You'll need to define this route in your Laravel backend
         post(route('patients.store'), {
-            onSuccess: () => reset(),
+            onSuccess: (id) => {
+                console.log('Patient created successfully!');
+                // You can redirect the user to the patient's profile page or any other page
+                window.location.href = route('patients.showTestRecord', { testRecord: id });
+            },
         });
     };
 
@@ -158,7 +174,13 @@ export default function CreatePatientPage() {
             }));
         }
     };
-
+    const handleBSACalc: FocusEventHandler<HTMLInputElement> = async() => {
+        if (data.height && data.weight) {
+            const heightInMeters = Number(data.height) / 3600;
+            const bsa = Math.sqrt(Number(data.weight) * heightInMeters);
+            setData('bsa', bsa.toFixed(2));
+        }
+    };
     const renderInputField = (
         id: keyof typeof data,
         label: string,
@@ -180,6 +202,7 @@ export default function CreatePatientPage() {
                 placeholder={placeholder || label}
                 className="mt-1 block w-full"
                 autoFocus={config?.autoFocus}
+                readOnly={id === 'bsa'}
                 onBlur={config?.onBlur}
             />
             <InputError message={errors[id]} className="mt-2" />
@@ -230,7 +253,24 @@ export default function CreatePatientPage() {
                                         })}</TableCell>
                                         <TableCell className="border p-2"> {renderInputField('surname', '', 'text', 'Surname')}</TableCell>
                                         <TableCell className="border p-2"> {renderInputField('other_names', '')}</TableCell>
-                                        <TableCell className="border p-2"> {renderInputField('gender', '')} {/* Consider using Select/Radio for Gender */}</TableCell>
+                                        <TableCell className="border p-2">
+                                            <div className="grid gap-2">
+                                                <Select
+                                                    value={data.gender}
+                                                    onValueChange={(value) => setData('gender', value)}
+                                                >
+                                                    <SelectTrigger className="w-[180px]">
+                                                        <SelectValue placeholder="Gender" />
+                                                    </SelectTrigger>
+
+                                                    <SelectContent>
+                                                        <SelectItem value="male">Male</SelectItem>
+                                                        <SelectItem value="female">Female</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                                <InputError message={errors.gender} className="mt-2" />
+                                            </div>
+                                        </TableCell>
                                         <TableCell className="border p-2"> {renderInputField('date_of_birth', '', 'date')}</TableCell>
                                         <TableCell className="border p-2">{renderInputField('nicl', '')}</TableCell>
                                     </TableRow>
@@ -250,9 +290,13 @@ export default function CreatePatientPage() {
                                         <TableCell className="border p-2">
                                             {renderInputField('test_date', '', 'date')}
                                         </TableCell>
-                                        <TableCell className="border p-2"> {renderInputField('weight', '')}</TableCell>
+                                        <TableCell className="border p-2"> {renderInputField('weight', '','number', 'Weight(kg)', {
+                                            onBlur: handleBSACalc,
+                                        })}</TableCell>
                                         <TableCell className="border p-2"> {renderInputField('wc_cm', '')}</TableCell>
-                                        <TableCell className="border p-2"> {renderInputField('height', '')} {/* Consider using Select/Radio for Gender */}</TableCell>
+                                        <TableCell className="border p-2"> {renderInputField('height', '', 'number', 'Height(cm)', {
+                                            onBlur: handleBSACalc,
+                                        })} {/* Consider using Select/Radio for Gender */}</TableCell>
                                         <TableCell className="border p-2"> {renderInputField('bsa', '')}</TableCell>
                                         <TableCell className="border p-2">{renderInputField('blood_pressure', '')}</TableCell>
                                     </TableRow>
@@ -260,9 +304,12 @@ export default function CreatePatientPage() {
                             </Table>
                         </div>
 
-                        <div className="flex justify-evenly mt-1 gap-2 align-center">
+                        <div className="grid grid-cols-1 md:grid-cols-3 border rounded justify-items-end items-center pb-1">
                             <h2 className="text-xl font-semibold mt-2">Indication for study:</h2>
-                            {renderInputField('indication', '', 'text', 'Indication for Study')}
+                            <div className='w-full md:col-span-2'>
+                                 {renderInputField('indication', '', 'text', 'Indication for Study')}
+                            </div>
+
                         </div>
                         <Table className='border'>
                            <TableHeader>
@@ -430,7 +477,7 @@ export default function CreatePatientPage() {
 
                         <div>
 
-                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 border rounded p-2">
                                 {renderInputField('triscupid_regurg_peak', 'Triscupid Regurgitation (Peak Velocity)', 'text', 'Optional')}
                                 {renderInputField('triscupid_regurg_press', 'Triscupid Regurgitation (Peak pressure gradient)', 'text', 'Optional')}
                                 {renderInputField('mitral_regurg_peak', 'Mitral Regurgitation (Peak Velocity)', 'text', 'Optional')}
@@ -448,7 +495,22 @@ export default function CreatePatientPage() {
                         <div>
                             <h2 className="mb-4 text-xl font-semibold">Final Report</h2>
                             <div className="grid grid-cols-1 gap-6">
-                                {renderInputField('pericardium', 'Pericardium', 'text', 'Optional')}
+                                <div className="grid gap-2">
+                                    <Select
+                                        value={data.pericardium}
+                                        onValueChange={(value) => setData('pericardium', value)}
+                                    >
+                                        <SelectTrigger className="w-[180px]">
+                                            <SelectValue placeholder="Pericardium" />
+                                        </SelectTrigger>
+
+                                        <SelectContent>
+                                            <SelectItem value="Normal">Normal</SelectItem>
+                                            <SelectItem value="Abnormal">Abnormal</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <InputError message={errors.gender} className="mt-2" />
+                                </div>
                                 {renderTextareaField('summary', 'Summary', 'Optional')}
                                 {renderTextareaField('conclusion', 'Conclusion', 'Optional')}
 

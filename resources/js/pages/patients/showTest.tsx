@@ -25,15 +25,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     }
 ];
 
-export default function ShowTest({ patient, testRecord }: {
-    patient: {
-        hospital_id: string;
-        surname: string;
-        other_names: string;
-        gender: string;
-        date_of_birth: string;
-        nicl: string;
-    },
+export default function ShowTest({testRecord }: {
     testRecord: {
         test_date: string;
         weight: number;
@@ -86,6 +78,14 @@ export default function ShowTest({ patient, testRecord }: {
         summary:string;
         sign:string;
         conclusion:string;
+        patient?: {
+            hospital_id: string;
+            surname: string;
+            other_names: string;
+            gender: string;
+            date_of_birth: string;
+            nicl: string;
+        }
     }
 }) {
     // Add print functionality
@@ -96,79 +96,55 @@ export default function ShowTest({ patient, testRecord }: {
             // Create a new window with only the test record content
             const printWindow = window.open('', '_blank');
             if (printWindow) {
-                printWindow.document.open();
+                printWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                        <head>
+                            <title>Test Record - ${testRecord.patient?.surname || 'Patient'} ${testRecord.patient?.other_names || ''}</title>
+                            <style>
+                                body { font-family: Arial, sans-serif; margin: 10px 60px;  }
+                                table { width: 100%; border-collapse: collapse; margin-top: 10px}
+                                th, td { border: 2px solid #ddd; padding: 2px 2px 2px 5px; font-size: 12px  }
+                                th { background-color: #f2f2f2; }
+                                h2, h3 { margin-top: 4px; font-size: 16px; }
+                                @media print {
+                                    button { display: none; }
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div>
+                               <div style="display:flex;
+                                            flex-direction:column;
+                                            align-items:center;
+                                            justify-content: flex-start
+                                            ">
 
-                // Create HTML structure using DOM methods instead of document.write
-                const html = printWindow.document.createElement('html');
 
-                const head = printWindow.document.createElement('head');
-                const title = printWindow.document.createElement('title');
-                title.textContent = `Test Record - ${patient.surname} ${patient.other_names}`;
+                               <img
+            src="/fmc_logo.jpeg" style="height: 100px; width: 100px; object-fit: cover; border-radius: 10%; margin-bottom:1px;"
+            alt="FMC Logo" />
+                                 <h2 style="padding:0; margin:0;">FEDERAL MEDICAL CENTRE</h2>
 
-                const style = printWindow.document.createElement('style');
-                style.textContent = `
-                    body { font-family: Arial, sans-serif; }
-                    table { width: 100%; border-collapse: collapse; }
-                    th, td { border: 1px solid #ddd; padding: 8px; }
-                    th { background-color: #f2f2f2; }
-                    h2, h3 { margin-top: 20px; }
-                    @media print {
-                        button { display: none; }
-                    }
-                `;
+                                 <h5 style="padding:0;margin:0;">JABI - AIRPORT ROAD ABUJA </h5>
 
-                head.appendChild(title);
-                head.appendChild(style);
+                                 <h5 style="padding:0;margin:0;">ECHOCARDIOGRAPHY LABORATORY</h5>
 
-                const body = printWindow.document.createElement('body');
 
-                const container = printWindow.document.createElement('div');
+                               </div>
 
-                const heading = printWindow.document.createElement('h1');
-                heading.textContent = `Test Record - ${patient.surname} ${patient.other_names}`;
-
-                const content = printWindow.document.createElement('div');
-                content.innerHTML = printContents;
-
-                const buttonContainer = printWindow.document.createElement('div');
-                buttonContainer.style.textAlign = 'center';
-                buttonContainer.style.marginTop = '30px';
-
-                const printButton = printWindow.document.createElement('button');
-                printButton.textContent = 'Print';
-                printButton.onclick = () => {
-                    printWindow.print();
-                    printWindow.close();
-                };
-
-                buttonContainer.appendChild(printButton);
-
-                container.appendChild(heading);
-                container.appendChild(content);
-                container.appendChild(buttonContainer);
-
-                body.appendChild(container);
-
-                html.appendChild(head);
-                html.appendChild(body);
-
-                printWindow.document.body = body;
-while (printWindow.document.head.firstChild) {
-    printWindow.document.head.removeChild(printWindow.document.head.firstChild);
-}
-Array.from(head.children).forEach(child => {
-    printWindow.document.head.appendChild(child);
-});
-while (printWindow.document.documentElement.firstChild) {
-    printWindow.document.documentElement.removeChild(printWindow.document.documentElement.firstChild);
-}
-printWindow.document.documentElement.appendChild(head);
-printWindow.document.documentElement.appendChild(body);
-
+                                ${printContents}
+                                <div style="text-align: center; margin-top: 30px;">
+                                    <button onclick="window.print(); window.close();">Print</button>
+                                </div>
+                            </div>
+                        </body>
+                    </html>
+                `);
                 printWindow.document.close();
             }
         }
-    }, [patient]);
+    }, [testRecord]);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -202,12 +178,12 @@ printWindow.document.documentElement.appendChild(body);
                                 </TableHeader>
                                 <TableBody>
                                     <TableRow>
-                                        <TableCell className="border p-2">{patient.hospital_id}</TableCell>
-                                        <TableCell className="border p-2">{patient.surname}</TableCell>
-                                        <TableCell className="border p-2">{patient.other_names}</TableCell>
-                                        <TableCell className="border p-2">{patient.gender}</TableCell>
-                                        <TableCell className="border p-2">{patient.date_of_birth}</TableCell>
-                                        <TableCell className="border p-2">{patient.nicl}</TableCell>
+                                        <TableCell className="border p-2">{testRecord.patient?.hospital_id || 'N/A'}</TableCell>
+                                        <TableCell className="border p-2">{testRecord?.patient?.surname || 'N/A'}</TableCell>
+                                        <TableCell className="border p-2">{testRecord?.patient?.other_names || 'N/A'}</TableCell>
+                                        <TableCell className="border p-2">{testRecord?.patient?.gender || 'N/A'}</TableCell>
+                                        <TableCell className="border p-2">{testRecord?.patient?.date_of_birth || 'N/A'}</TableCell>
+                                        <TableCell className="border p-2">{testRecord?.patient?.nicl || 'N/A'}</TableCell>
                                     </TableRow>
                                 </TableBody>
                                 <TableHeader>
@@ -233,9 +209,21 @@ printWindow.document.documentElement.appendChild(body);
                             </Table>
                         </div>
 
-                        <div className="flex justify-evenly mt-1 gap-2 align-center">
-                            <h2 className="text-xl font-semibold mt-2">Indication for study:</h2>
-                            <div className="flex-1 p-2 border rounded">{testRecord.indication}</div>
+                        <div className="flex justify-evenly mt-1 gap-2 align-center" style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(4, 1fr)',
+                            gap: '20px',
+                            fontSize: '14px',
+                            justifyContent: 'start',
+                            alignItems: 'center',
+                        }}>
+                            <h2 className="text-xl font-semibold mt-2" style={{
+                                fontSize: '14px',
+                                paddingTop: '1px'
+                            }}>Indication for study:</h2>
+                            <div className="flex-1 p-2 border rounded" style={{
+                                gridColumn: 'span 3',
+                            }}>{testRecord.indication}</div>
                         </div>
                         <Table className='border'>
                             <TableHeader>
@@ -400,69 +388,258 @@ printWindow.document.documentElement.appendChild(body);
                             </TableBody>
                         </Table>
 
-                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                            <div className="border p-2 rounded">
-                                <h3 className="font-semibold mb-1">Triscupid Regurgitation (Peak Velocity)</h3>
-                                <p>{testRecord.triscupid_regurg_peak}</p>
+                        <div className="grid grid-cols-1" style={{
+                            display: 'grid',
+                            gap: '10px',
+                            fontSize: '14px',
+                            marginTop: '8px'
+                        }}>
+                        <div className="border p-2 rounded" style={{
+                                display: 'flex',
+                                justifyContent: 'start',
+                                alignItems: 'center',
+                            }}>
+                                <h3 className="font-semibold mb-1" style={{
+                                    fontSize: '14px',
+                                    flexGrow: '1',
+                                }}>Triscupid Regurgitation (Peak Velocity)</h3>
+                                <p style={{ width: '60%',
+                                    border: '1px solid black',
+                                    borderRadius: '5px',
+                                    padding: '10px',
+                                }}>{testRecord.triscupid_regurg_peak}</p>
                             </div>
-                            <div className="border p-2 rounded">
-                                <h3 className="font-semibold mb-1">Triscupid Regurgitation (Peak pressure gradient)</h3>
-                                <p>{testRecord.triscupid_regurg_press}</p>
+                            <div className="border p-2 rounded" style={{
+                                display: 'flex',
+                                justifyContent: 'start',
+                                alignItems: 'center',
+                            }}>
+                                <h3 className="font-semibold mb-1" style={{
+                                    fontSize: '14px',
+                                    flexGrow: '1',
+                                }}>Triscupid Regurgitation (Peak pressure gradient)</h3>
+                                <p
+                                    style={{
+                                        width: '60%',
+                                        border: '1px solid black',
+                                        borderRadius: '5px',
+                                        padding: '10px',
+                                    }}>{testRecord.triscupid_regurg_press}</p>
                             </div>
-                            <div className="border p-2 rounded">
-                                <h3 className="font-semibold mb-1">Mitral Regurgitation (Peak Velocity)</h3>
-                                <p>{testRecord.mitral_regurg_peak}</p>
+                            <div className="border p-2 rounded" style={{
+                                display: 'flex',
+                                justifyContent: 'start',
+                                alignItems: 'center',
+                            }}>
+                                <h3 className="font-semibold mb-1" style={{
+                                    fontSize: '14px',
+                                    flexGrow: '1',
+                                }}>Mitral Regurgitation (Peak Velocity)</h3>
+                                <p
+                                    style={{
+                                        width: '60%',
+                                        border: '1px solid black',
+                                        borderRadius: '5px',
+                                        padding: '10px',
+                                    }}>{testRecord.mitral_regurg_peak}</p>
                             </div>
-                            <div className="border p-2 rounded">
-                                <h3 className="font-semibold mb-1">Mitral Regurgitation (Pressure Gradient)</h3>
-                                <p>{testRecord.mitral_regurg_press}</p>
+                            <div className="border p-2 rounded" style={{
+                                display: 'flex',
+                                justifyContent: 'start',
+                                alignItems: 'center',
+                            }}>
+                                <h3 className="font-semibold mb-1" style={{
+                                    fontSize: '14px',
+                                    flexGrow: '1',
+                                }}>Mitral Regurgitation (Pressure Gradient)</h3>
+                                <p style={{
+                                    width: '60%',
+                                    border: '1px solid black',
+                                    borderRadius: '5px',
+                                    padding: '10px',
+                                }}>{testRecord.mitral_regurg_press}</p>
                             </div>
-                            <div className="border p-2 rounded">
-                                <h3 className="font-semibold mb-1">Aortic Regurgitation (Peak Velocity)</h3>
-                                <p>{testRecord.aortic_regurg_peak}</p>
+                            <div className="border p-2 rounded" style={{
+                                display: 'flex',
+                                justifyContent: 'start',
+                                alignItems: 'center',
+                            }}>
+                                <h3 className="font-semibold mb-1" style={{
+                                    fontSize: '14px',
+                                    flexGrow: '1',
+                                }}>Aortic Regurgitation (Peak Velocity)</h3>
+                                <p
+                                    style={{
+                                        width: '60%',
+                                        border: '1px solid black',
+                                        borderRadius: '5px',
+                                        padding: '10px',
+                                    }}>{testRecord.aortic_regurg_peak}</p>
                             </div>
-                            <div className="border p-2 rounded">
-                                <h3 className="font-semibold mb-1">Aortic Regurgitation (Pressure Gradient)</h3>
-                                <p>{testRecord.aortic_regurg_press}</p>
+                            <div className="border p-2 rounded" style={{
+                                display: 'flex',
+                                justifyContent: 'start',
+                                alignItems: 'center',
+                            }}>
+                                <h3 className="font-semibold mb-1" style={{
+                                    fontSize: '14px',
+                                    flexGrow: '1',
+                                }}>Aortic Regurgitation (Pressure Gradient)</h3>
+                                <p
+                                    style={{
+                                        width: '60%',
+                                        border: '1px solid black',
+                                        borderRadius: '5px',
+                                        padding: '10px',
+                                    }}>{testRecord.aortic_regurg_press}</p>
                             </div>
-                            <div className="border p-2 rounded">
-                                <h3 className="font-semibold mb-1">Mitral Stenosis(Valve Area)</h3>
-                                <p>{testRecord.mitral_stenosis}</p>
+                            <div className="border p-2 rounded" style={{
+                                display: 'flex',
+                                justifyContent: 'start',
+                                alignItems: 'center',
+                            }}>
+                                <h3 className="font-semibold mb-1" style={{
+                                    fontSize: '14px',
+                                    flexGrow: '1',
+                                }}>Mitral Stenosis(Valve Area)</h3>
+                                <p
+                                    style={{
+                                        width: '60%',
+                                        border: '1px solid black',
+                                        borderRadius: '5px',
+                                        padding: '10px',
+                                    }}>{testRecord.mitral_stenosis}</p>
                             </div>
-                            <div className="border p-2 rounded">
-                                <h3 className="font-semibold mb-1">Inferior Vena Cava (Diameter in Inspiration)</h3>
-                                <p>{testRecord.inferior_vena_cava_insp}</p>
+                            <div className="border p-2 rounded" style={{
+                                display: 'flex',
+                                justifyContent: 'start',
+                                alignItems: 'center',
+                            }}>
+                                <h3 className="font-semibold mb-1" style={{
+                                    fontSize: '14px',
+                                    flexGrow: '1',
+                                }}>Inferior Vena Cava (Diameter in Inspiration)</h3>
+                                <p
+                                    style={{
+                                        width: '60%',
+                                        border: '1px solid black',
+                                        borderRadius: '5px',
+                                        padding: '10px',
+                                    }}>{testRecord.inferior_vena_cava_insp}</p>
                             </div>
-                            <div className="border p-2 rounded">
-                                <h3 className="font-semibold mb-1">Inferior Vena Cava (Diameter in Expiration)</h3>
-                                <p>{testRecord.inferior_vena_cava_expi}</p>
+                            <div className="border p-2 rounded" style={{
+                                display: 'flex',
+                                justifyContent: 'start',
+                                alignItems: 'center',
+                            }}>
+                                <h3 className="font-semibold mb-1" style={{
+                                    fontSize: '14px',
+                                    flexGrow: '1',
+                                }}>Inferior Vena Cava (Diameter in Expiration)</h3>
+                                <p
+                                    style={{
+                                        width: '60%',
+                                        border: '1px solid black',
+                                        borderRadius: '5px',
+                                        padding: '10px',
+                                    }}>{testRecord.inferior_vena_cava_expi}</p>
                             </div>
-                            <div className="border p-2 rounded">
-                                <h3 className="font-semibold mb-1">Inferior Vena Cava (Diameter with valsalva manoeuvre)</h3>
-                                <p>{testRecord.inferior_vena_cava_diam}</p>
+                            <div className="border p-2 rounded" style={{
+                                display: 'flex',
+                                justifyContent: 'start',
+                                alignItems: 'center',
+                            }}>
+                                <h3 className="font-semibold mb-1" style={{
+                                    fontSize: '14px',
+                                    flexGrow: '1',
+                                }}>Inferior Vena Cava (Diameter with valsalva manoeuvre)</h3>
+                                <p
+                                    style={{
+                                        width: '60%',
+                                        border: '1px solid black',
+                                        borderRadius: '5px',
+                                        padding: '10px',
+                                    }}>{testRecord.inferior_vena_cava_diam}</p>
                             </div>
-                            <div className="border p-2 rounded">
-                                <h3 className="font-semibold mb-1">Est. Right Atrial Pressure</h3>
-                                <p>{testRecord.est_right}</p>
+                            <div className="border p-2 rounded" style={{
+                                display: 'flex',
+                                justifyContent: 'start',
+                                alignItems: 'center',
+                            }}>
+                                <h3 className="font-semibold mb-1" style={{
+                                    fontSize: '14px',
+                                    flexGrow: '1',
+                                }}>Est. Right Atrial Pressure</h3>
+                                <p
+                                    style={{
+                                        width: '60%',
+                                        border: '1px solid black',
+                                        borderRadius: '5px',
+                                        padding: '10px',
+                                    }}>{testRecord.est_right}</p>
                             </div>
                         </div>
 
                         <div className="space-y-4">
-                            <div className="border p-4 rounded">
-                                <h3 className="font-semibold mb-2">Pericardium</h3>
-                                <p>{testRecord.pericardium}</p>
+                            <div className="border p-4 rounded" style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(4, 1fr)',
+                                gap: '20px',
+                                fontSize: '14px',
+                                justifyContent: 'start',
+                                alignItems: 'center',
+                            }}>
+                                <h3 className="font-semibold mb-2" style={{
+                                    fontSize: '14px',
+                                }}>Pericardium</h3>
+                                <p style={{
+                                    gridColumn: 'span 3',
+                                }}>{testRecord.pericardium}</p>
                             </div>
-                            <div className="border p-4 rounded">
-                                <h3 className="font-semibold mb-2">Summary</h3>
-                                <p>{testRecord.summary}</p>
+                            <div className="border p-4 rounded" style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(4, 1fr)',
+                                gap: '20px',
+                                fontSize: '14px',
+                                justifyContent: 'start',
+                                alignItems: 'center',
+                            }}>
+                                <h3 className="font-semibold mb-2" style={{
+                                    fontSize: '14px',
+                                }}>Summary</h3>
+                                <p style={{
+                                    gridColumn: 'span 3',
+                                }}>{testRecord.summary}</p>
                             </div>
-                            <div className="border p-4 rounded">
-                                <h3 className="font-semibold mb-2">Conclusion</h3>
-                                <p>{testRecord.conclusion}</p>
+                            <div className="border p-4 rounded" style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(4, 1fr)',
+                                gap: '20px',
+                                fontSize: '14px',
+                                justifyContent: 'start',
+                                alignItems: 'center',
+                            }}>
+                                <h3 className="font-semibold mb-2" style={{
+                                    fontSize: '14px',
+                                }}>Conclusion</h3>
+                                <p style={{
+                                    gridColumn: 'span 3',
+                                }}>{testRecord.conclusion}</p>
                             </div>
-                            <div className="border p-4 rounded">
-                                <h3 className="font-semibold mb-2">Signed</h3>
-                                <p>{testRecord.sign}</p>
+                            <div className="border p-4 rounded" style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(4, 1fr)',
+                                gap: '20px',
+                                fontSize: '14px',
+                                justifyContent: 'start',
+                                alignItems: 'center',
+                            }}>
+                                <h3 className="font-semibold mb-2" style={{
+                                    fontSize: '14px',
+                                }} >Signed</h3>
+                                <p style={{
+                                    gridColumn: 'span 3',
+                                }}>{testRecord.sign}</p>
                             </div>
                         </div>
                     </div>

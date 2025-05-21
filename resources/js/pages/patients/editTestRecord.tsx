@@ -236,7 +236,20 @@ export default function EditTestRecordPage({ data: testRecord }: { data: {
                                         })}</TableCell>
                                         <TableCell className="border p-2"> {renderInputField('surname', '', 'text', 'Surname')}</TableCell>
                                         <TableCell className="border p-2"> {renderInputField('other_names', '')}</TableCell>
-                                        <TableCell className="border p-2"> {renderInputField('gender', '')} </TableCell>
+                                        <TableCell className="border p-2"> <div className="grid gap-2">
+                                            <select
+                                                id="gender"
+                                                name="gender"
+                                                value={data.gender}
+                                                onChange={(e) => setData('gender', e.target.value)}
+                                                className="mt-1 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                                            >
+                                                <option value="">Select Gender</option>
+                                                <option value="male">Male</option>
+                                                <option value="female">Female</option>
+                                            </select>
+                                            <InputError message={errors.gender} className="mt-2" />
+                                        </div> </TableCell>
                                         <TableCell className="border p-2"> {renderInputField('date_of_birth', '', 'date')}</TableCell>
                                         <TableCell className="border p-2">{renderInputField('nicl', '')}</TableCell>
                                     </TableRow>

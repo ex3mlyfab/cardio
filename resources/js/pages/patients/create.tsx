@@ -103,6 +103,14 @@ export default function CreatePatientPage() {
         sign: '',
     });
 
+    // Add this function to handle keydown events
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        // Prevent form submission when Enter key is pressed
+        if (e.key === 'Enter') {
+            e.preventDefault();
+        }
+    };
+
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         // You'll need to define this route in your Laravel backend
@@ -181,6 +189,36 @@ export default function CreatePatientPage() {
             setData('bsa', bsa.toFixed(2));
         }
     };
+    const handleEACalc: FocusEventHandler<HTMLInputElement> = async() => {
+        if (data.e_wave && data.a_wave) {
+            const e_a = Number(data.e_wave) /  Number(data.a_wave);
+            setData('e_a', e_a.toFixed(2));
+        }
+    };
+    const handleEECalc: FocusEventHandler<HTMLInputElement> = async() => {
+        if (data.e_wave && data.e_lat) {
+            const e_e = Number(data.e_wave) /  Number(data.e_lat);
+            setData('e_e', e_e.toFixed(2));
+        }
+    };
+    const handleRVSPCalc: FocusEventHandler<HTMLInputElement> = async() => {
+        if (data.triscupid_regurg_peak) {
+            const rvsp = Math.pow(Number(data.triscupid_regurg_peak),2);
+            setData('mvsp', rvsp.toFixed(2));
+        }
+    }
+    const handlePASPCalc: FocusEventHandler<HTMLInputElement> = async() => {
+        if (data.mvsp && data.est_right) {
+            const pasp = Number(data.mvsp) + Number(data.est_right);
+            setData('pasp', pasp.toFixed(2));
+            const mpap = (0.61 * Number(data.pasp)) + 2;
+            setData('mpap', mpap.toFixed(2));
+        }
+
+
+
+    }
+
     const renderInputField = (
         id: keyof typeof data,
         label: string,
@@ -204,6 +242,7 @@ export default function CreatePatientPage() {
                 autoFocus={config?.autoFocus}
                 readOnly={id === 'bsa'}
                 onBlur={config?.onBlur}
+                onKeyDown={handleKeyDown}
             />
             <InputError message={errors[id]} className="mt-2" />
         </div>
@@ -219,6 +258,7 @@ export default function CreatePatientPage() {
                 onChange={(e) => setData(id, e.target.value)}
                 placeholder={placeholder || label}
                 className="mt-1 block w-full"
+                onKeyDown={handleKeyDown}
             />
             <InputError message={errors[id]} className="mt-2" />
         </div>
@@ -231,7 +271,7 @@ export default function CreatePatientPage() {
 
                 {/* Form Container */}
                 <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl border p-4 md:p-6">
-                    <form onSubmit={submit} className="space-y-8">
+                    <form onSubmit={submit} className="space-y-8" onKeyDown={handleKeyDown}>
                         <div>
                             <h2 className="mb-4 text-xl font-semibold">Patient Details</h2>
                             <Table className='border'>
@@ -404,15 +444,21 @@ export default function CreatePatientPage() {
                                 <TableRow>
                                     <TableCell className="border p-1"> E Wave (m/s)</TableCell>
                                     <TableCell className="border p-1"> </TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('e_wave', '', 'number', 'E Wave')}</TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('e_wave', '', 'number', 'E Wave',{
+                                        onBlur: handleEACalc
+                                    })}</TableCell>
                                     <TableCell className="border p-1"> E' (lat)(m/s)</TableCell>
                                     <TableCell className="border p-1"></TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('e_lat', '', 'number', '')}</TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('e_lat', '', 'number', '',{
+                                        onBlur: handleEECalc
+                                    })}</TableCell>
                                 </TableRow>
                                 <TableRow>
                                     <TableCell className="border p-1"> A Wave(m/s)</TableCell>
                                     <TableCell className="border p-1"> </TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('a_wave', '', 'number', '')}</TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('a_wave', '', 'number', 'A Wave', {
+                                        onBlur: handleEACalc
+                                    })}</TableCell>
                                     <TableCell className="border p-1"> A'(lat)(m/s)</TableCell>
                                     <TableCell className="border p-1"> </TableCell>
                                     <TableCell className="border p-1"> {renderInputField('a_lat', '', 'number', '')}</TableCell>
@@ -444,54 +490,122 @@ export default function CreatePatientPage() {
                             </TableBody>
                         </Table>
                         <Table className='mt-1'>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="border p-2">Doppler Measurements</TableHead>
-                                    <TableHead className="border p-2">Normal</TableHead>
-                                    <TableHead className="border p-2 w-[150px]">Patient Value</TableHead>
-                                    <TableHead className="border p-2"></TableHead>
-                                    <TableHead className="border p-2">Normal</TableHead>
-                                    <TableHead className="border p-2 w-[150px]">Patient Value</TableHead>
-                                </TableRow>
-                            </TableHeader>
+
                             <TableBody>
                                 <TableRow>
                                     <TableCell className="border p-1"> Aortic Valve(Peak vel)</TableCell>
-                                    <TableCell className="border p-1"> </TableCell>
+
                                     <TableCell className="border p-1"> {renderInputField('aortic_valve_peak', '', 'number', '')}</TableCell>
                                     <TableCell className="border p-1"> Pulmonary valve (Peak vel)</TableCell>
-                                    <TableCell className="border p-1"> </TableCell>
+
                                     <TableCell className="border p-1"> {renderInputField('pulmonary_valve_peak', '', 'number', '')}</TableCell>
                                 </TableRow>
                                 <TableRow>
                                     <TableCell className="border p-1"> Aortic valve (pressure gradient)</TableCell>
-                                    <TableCell className="border p-1"> </TableCell>
+
                                     <TableCell className="border p-1"> {renderInputField('aortic_valve_press', '', 'number', '')}</TableCell>
                                     <TableCell className="border p-1"> Pulmonary valve (pressure gradient)</TableCell>
-                                    <TableCell className="border p-1"> </TableCell>
+
                                     <TableCell className="border p-1"> {renderInputField('pulmonary_valve_press', '', 'number', '')}</TableCell>
                                 </TableRow>
                             </TableBody>
                         </Table>
-
-
-                        <div>
-
-                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 border rounded p-2">
-                                {renderInputField('triscupid_regurg_peak', 'Triscupid Regurgitation (Peak Velocity)', 'text', 'Optional')}
-                                {renderInputField('triscupid_regurg_press', 'Triscupid Regurgitation (Peak pressure gradient)', 'text', 'Optional')}
-                                {renderInputField('mitral_regurg_peak', 'Mitral Regurgitation (Peak Velocity)', 'text', 'Optional')}
-                                {renderInputField('mitral_regurg_press', 'Mitral Regurgitation (Pressure Gradient)', 'text', 'Optional')}
-                                {renderInputField('aortic_regurg_peak', 'Aortic Regurgitation (Peak Velocity)', 'text', 'Optional')}
-                                {renderInputField('aortic_regurg_press', 'Aortic Regurgitation (Pressure Gradient)', 'text', 'Optional')}
-                                {renderInputField('mitral_stenosis', 'Mitral Stenosis(Valve Area) ', 'text', 'Optional')}
-                                {renderInputField('inferior_vena_cava_insp', 'Inferior Vena Cava (Diameter in Inspiration)', 'text', 'Optional')}
-                                {renderInputField('inferior_vena_cava_expi', 'Inferior Vena Cava (Diameter in Expiration)', 'text', 'Optional')}
-                                {renderInputField('inferior_vena_cava_diam', 'Inferior Vena Cava (Diameter with valsalva manoeuvre)', 'text', 'Optional')}
-                                {renderInputField('est_right', 'Est. Right Atrial Pressure', 'text', 'Optional')}
-                            </div>
-                        </div>
-
+                        <Table className='nt-1'>
+                            <TableBody>
+                                <TableRow>
+                                    <TableCell className="border p-1"> TRV<sub>max</sub></TableCell>
+                                    <TableCell className="border p-1">
+                                        {renderInputField('triscupid_regurg_peak', '', 'number')}
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        TR<sub>max</sub>PG
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        {renderInputField('triscupid_regurg_press', '', 'number','', {
+                                            onBlur: handleRVSPCalc
+                                        })}
+                                    </TableCell>
+                                    <TableCell className="border p-1"> MRV <sub>max</sub></TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('mitral_regurg_peak', '', 'number', '')}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell className="border p-1"> MR<sub>max</sub>PG</TableCell>
+                                    <TableCell className="border p-1">
+                                        {renderInputField('mitral_regurg_press', '', 'number', '')}
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        ARV<sub>max</sub>
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        {renderInputField('aortic_regurg_peak', '', 'number', '')}
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        AR<sub>max</sub>PG
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        {renderInputField('aortic_regurg_press', '', 'number', '')}
+                                    </TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell className="border p-1">
+                                        Mitral Stenosis (valve Area)
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        {renderInputField('mitral_stenosis', '', 'number', '')}
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        IVC<sub>(ins)</sub>
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        {renderInputField('inferior_vena_cava_insp', '', 'number', '')}
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        IVC<sub>(ex)</sub>
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        {renderInputField('inferior_vena_cava_expi', '', 'number', '')}
+                                    </TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell className="border p-1">
+                                        IVC<sub>(diameter with valva manoeuvre)</sub>
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        {renderInputField('inferior_vena_cava_diam', '', 'number', '')}
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                       Est. Right Aterial pressure
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        {renderInputField('est_right', '', 'number', '',{
+                                            onBlur: handlePASPCalc
+                                        })}
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                       PASP
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        {renderInputField('pasp', '', 'number', '')}
+                                    </TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell className="border p-1">
+                                        MPAP
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        {renderInputField('mpap', '', 'number', '')}
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                       RVSP
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        {renderInputField('mvsp', '', 'number', '')}
+                                    </TableCell>
+                                    <TableCell className="border p-1"> </TableCell>
+                                     <TableCell className="border p-1"> </TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
                         <div>
                             <h2 className="mb-4 text-xl font-semibold">Final Report</h2>
                             <div className="grid grid-cols-1 gap-6">
@@ -500,7 +614,7 @@ export default function CreatePatientPage() {
                                         value={data.pericardium}
                                         onValueChange={(value) => setData('pericardium', value)}
                                     >
-                                        <SelectTrigger className="w-[180px]">
+                                        <SelectTrigger className="w-[250px]">
                                             <SelectValue placeholder="Pericardium" />
                                         </SelectTrigger>
 
@@ -516,7 +630,34 @@ export default function CreatePatientPage() {
 
                             </div>
                             <div className="mt-3">
-                                {renderInputField('sign', 'Sign (Doctor)', 'text', 'Optional')}
+                            <Label>Signed:</Label>
+                               <Select value='{data.sign}'
+                                onValueChange={(value) => setData('sign', value)}
+                                >
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Signed" />
+                                    </SelectTrigger>
+
+                                    <SelectContent>
+                                        <SelectItem value="Dr. SALAU (FWACP)">Dr. SALAU (FWACP)</SelectItem>
+                                        <SelectItem value="DR. ABIODUN (FWACP)">DR. ABIODUN (FWACP)</SelectItem>
+                                        <SelectItem value="DR. BELLO (FWACP)">DR. BELLO (FWACP)</SelectItem>
+                                        <SelectItem value="DR. SAMBO (FWACP)">DR. SAMBO (FWACP)</SelectItem>
+                                        <SelectItem value="DR. MOHAMMED, DR. SALAU (FWACP)">DR. MOHAMMED,DR. SALAU (FWACP)</SelectItem>
+                                        <SelectItem value="DR. MOHAMMED, DR. ABIODUN (FWACP)">DR. MOHAMMED,DR. ABIODUN (FWACP)</SelectItem>
+                                        <SelectItem value="DR. MOHAMMED, DR. BELLO (FWACP)">DR. MOHAMMED,DR. BELLO (FWACP)</SelectItem>
+                                        <SelectItem value="DR. MOHAMMED, DR. SAMBO (FWACP)">DR. MOHAMMED,DR. SAMBO (FWACP)</SelectItem>
+                                        <SelectItem value="DR. BASSEY, DR. SALAU (FWACP)">DR. BASSEY,DR. SALAU (FWACP)</SelectItem>
+                                        <SelectItem value="DR. BASSEY, DR. ABIODUN (FWACP)">DR. BASSEY,DR. ABIODUN (FWACP)</SelectItem>
+                                        <SelectItem value="DR. BASSEY, DR. BELLO (FWACP)">DR. BASSEY,DR. BELLO (FWACP)</SelectItem>
+                                        <SelectItem value="DR. BASSEY, DR. SAMBO (FWACP)">DR. BASSEY,DR. SAMBO (FWACP)</SelectItem>
+                                        <SelectItem value="DR. OBODO, DR. SALAU (FWACP)">DR. OBODO ,DR. SALAU (FWACP)</SelectItem>
+                                        <SelectItem value="DR. OBODO, DR. ABIODUN (FWACP)">DR. OBODO ,DR. ABIODUN (FWACP)</SelectItem>
+                                        <SelectItem value="DR. OBODO, DR. BELLO (FWACP)">DR. OBODO ,DR. BELLO (FWACP)</SelectItem>
+                                        <SelectItem value="DR. OBODO, DR. SAMBO (FWACP)">DR. OBODO ,DR. SAMBO (FWACP)</SelectItem>
+                                    </SelectContent>
+
+                               </Select>
                             </div>
                         </div>
 

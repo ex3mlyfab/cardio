@@ -219,6 +219,7 @@ class PatientController extends Controller
     }
     public function editTestRecord(TestRecord $testRecord)
     {
+        $testRecord->load('patient');
         return Inertia::render('patients/editTestRecord', [
             'data' => $testRecord,
         ]);

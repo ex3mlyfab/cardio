@@ -19,6 +19,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('{patient}',[\App\Http\Controllers\PatientController::class,'update'])->name('patients.update');
         Route::delete('{patient}',[\App\Http\Controllers\PatientController::class,'destroy'])->name('patients.destroy');
         Route::get('{patient}/search', [\App\Http\Controllers\PatientController::class, 'searchPatient'])->name('patients.search');
+        Route::get('/updateTest/{testRecord}/tests', [\App\Http\Controllers\PatientController::class,'editTestRecord'])->name('patients.editTest');
+        Route::put('/updateTest/{testRecord}/tests', [\App\Http\Controllers\PatientController::class,'updateTestRecord'])->name('patients.updateTest');
 
     });
 });

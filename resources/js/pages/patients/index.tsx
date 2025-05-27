@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { FileText } from 'lucide-react';
+import { FileText, FilePenLine } from 'lucide-react';
 import { useState, useCallback } from 'react';
 import { debounce } from 'lodash';
 
@@ -181,7 +181,13 @@ export default function PatientsIndex({ tests, filters, flash }: PatientsIndexPr
                                                 <Button variant="outline" size="sm" asChild>
                                                     <Link href={route('patients.showTest', test.id)}>
                                                         <FileText className="h-4 w-4 mr-1" />
-                                                        View
+                                                          View
+                                                    </Link>
+                                                </Button>
+                                                <Button variant="outline" size="sm" asChild>
+                                                    <Link href={route('patients.editTest', test.id)}>
+                                                        <FilePenLine className="h-4 w-4 mr-1" />
+                                                        Update
                                                     </Link>
                                                 </Button>
                                             </TableCell>

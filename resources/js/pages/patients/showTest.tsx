@@ -75,6 +75,9 @@ export default function ShowTest({testRecord }: {
         inferior_vena_cava_diam: string;
         est_right: string;
         pericardium: string;
+        pasp:string;
+        mvsp:string;
+        mpap:string;
         summary:string;
         sign:string;
         conclusion:string;
@@ -102,11 +105,11 @@ export default function ShowTest({testRecord }: {
                         <head>
                             <title>Test Record - ${testRecord.patient?.surname || 'Patient'} ${testRecord.patient?.other_names || ''}</title>
                             <style>
-                                body { font-family: Arial, sans-serif; margin: 10px 60px;  }
+                                body { font-family: Arial, sans-serif; margin: 10px 55px;  }
                                 table { width: 100%; border-collapse: collapse; margin-top: 10px}
                                 th, td { border: 2px solid #ddd; padding: 2px 2px 2px 5px; font-size: 12px  }
                                 th { background-color: #f2f2f2; }
-                                h2, h3 { margin-top: 4px; font-size: 16px; }
+                                h2, h3 { margin-top: 4px; font-size: 14px; }
                                 @media print {
                                     button { display: none; }
                                 }
@@ -218,7 +221,7 @@ export default function ShowTest({testRecord }: {
                             alignItems: 'center',
                         }}>
                             <h2 className="text-xl font-semibold mt-2" style={{
-                                fontSize: '14px',
+                                fontSize: '12px',
                                 paddingTop: '1px'
                             }}>Indication for study:</h2>
                             <div className="flex-1 p-2 border rounded" style={{
@@ -226,16 +229,6 @@ export default function ShowTest({testRecord }: {
                             }}>{testRecord.indication}</div>
                         </div>
                         <Table className='border'>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="border p-2">Dimensions</TableHead>
-                                    <TableHead className="border p-2">Normal</TableHead>
-                                    <TableHead className="border p-2 w-[150px]">Patient Value</TableHead>
-                                    <TableHead className="border p-2"></TableHead>
-                                    <TableHead className="border p-2">Normal</TableHead>
-                                    <TableHead className="border p-2 w-[150px]">Patient Value</TableHead>
-                                </TableRow>
-                            </TableHeader>
                             <TableBody>
                                 <TableRow>
                                     <TableCell className="border p-1">Aortic Root</TableCell>
@@ -304,16 +297,6 @@ export default function ShowTest({testRecord }: {
                             </TableBody>
                         </Table>
                         <Table className='mt-1'>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="border p-2">Diastolic Function</TableHead>
-                                    <TableHead className="border p-2">Normal</TableHead>
-                                    <TableHead className="border p-2 w-[150px]">Patient Value</TableHead>
-                                    <TableHead className="border p-2"></TableHead>
-                                    <TableHead className="border p-2">Normal</TableHead>
-                                    <TableHead className="border p-2 w-[150px]">Patient Value</TableHead>
-                                </TableRow>
-                            </TableHeader>
                             <TableBody>
                                 <TableRow>
                                     <TableCell className="border p-1">E Wave (m/s)</TableCell>
@@ -358,227 +341,118 @@ export default function ShowTest({testRecord }: {
                             </TableBody>
                         </Table>
                         <Table className='mt-1'>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="border p-2">Doppler Measurements</TableHead>
-                                    <TableHead className="border p-2">Normal</TableHead>
-                                    <TableHead className="border p-2 w-[150px]">Patient Value</TableHead>
-                                    <TableHead className="border p-2"></TableHead>
-                                    <TableHead className="border p-2">Normal</TableHead>
-                                    <TableHead className="border p-2 w-[150px]">Patient Value</TableHead>
-                                </TableRow>
-                            </TableHeader>
                             <TableBody>
                                 <TableRow>
                                     <TableCell className="border p-1">Aortic Valve(Peak vel)</TableCell>
-                                    <TableCell className="border p-1"></TableCell>
+
                                     <TableCell className="border p-1">{testRecord.aortic_valve_peak}</TableCell>
                                     <TableCell className="border p-1">Pulmonary valve (Peak vel)</TableCell>
-                                    <TableCell className="border p-1"></TableCell>
+
                                     <TableCell className="border p-1">{testRecord.pulmonary_valve_peak}</TableCell>
                                 </TableRow>
                                 <TableRow>
                                     <TableCell className="border p-1">Aortic valve (pressure gradient)</TableCell>
-                                    <TableCell className="border p-1"></TableCell>
+
                                     <TableCell className="border p-1">{testRecord.aortic_valve_press}</TableCell>
                                     <TableCell className="border p-1">Pulmonary valve (pressure gradient)</TableCell>
-                                    <TableCell className="border p-1"></TableCell>
+
                                     <TableCell className="border p-1">{testRecord.pulmonary_valve_press}</TableCell>
                                 </TableRow>
                             </TableBody>
                         </Table>
+                        <Table className='nt-1'>
+                            <TableBody>
+                                <TableRow>
+                                    <TableCell className="border p-1"> TRV<sub>max</sub></TableCell>
+                                    <TableCell className="border p-1">
+                                        {testRecord.triscupid_regurg_peak}
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        TR<sub>max</sub>PG
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        {testRecord.triscupid_regurg_press}
+                                    </TableCell>
+                                    <TableCell className="border p-1"> MRV <sub>max</sub></TableCell>
+                                    <TableCell className="border p-1"> {testRecord.mitral_regurg_peak}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell className="border p-1"> MR<sub>max</sub>PG</TableCell>
+                                    <TableCell className="border p-1">
+                                        {testRecord.mitral_regurg_press}
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        ARV<sub>max</sub>
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        {testRecord.aortic_regurg_peak}
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        AR<sub>max</sub>PG
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        {testRecord.aortic_regurg_press}
+                                    </TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell className="border p-1">
+                                        Mitral Stenosis (valve Area)
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        {testRecord.mitral_stenosis}
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        IVC<sub>(ins)</sub>
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        {testRecord.inferior_vena_cava_insp}
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        IVC<sub>(ex)</sub>
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        {testRecord.inferior_vena_cava_expi}
+                                    </TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell className="border p-1">
+                                        IVC<sub>(diameter with valva manoeuvre)</sub>
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        {testRecord.inferior_vena_cava_diam}
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        Est. Right Aterial pressure
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        {testRecord.est_right}
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        PASP
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        {testRecord.pasp}
+                                    </TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell className="border p-1">
+                                        MPAP
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        {testRecord.mpap}
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        RVSP
+                                    </TableCell>
+                                    <TableCell className="border p-1">
+                                        {testRecord.mvsp}
+                                    </TableCell>
+                                    <TableCell className="border p-1"> </TableCell>
+                                    <TableCell className="border p-1"> </TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
 
-                        <div className="grid grid-cols-1" style={{
-                            display: 'grid',
-                            gap: '10px',
-                            fontSize: '14px',
-                            marginTop: '8px'
-                        }}>
-                        <div className="border p-2 rounded" style={{
-                                display: 'flex',
-                                justifyContent: 'start',
-                                alignItems: 'center',
-                            }}>
-                                <h3 className="font-semibold mb-1" style={{
-                                    fontSize: '14px',
-                                    flexGrow: '1',
-                                }}>Triscupid Regurgitation (Peak Velocity)</h3>
-                                <p style={{ width: '60%',
-                                    border: '1px solid black',
-                                    borderRadius: '5px',
-                                    padding: '10px',
-                                }}>{testRecord.triscupid_regurg_peak}</p>
-                            </div>
-                            <div className="border p-2 rounded" style={{
-                                display: 'flex',
-                                justifyContent: 'start',
-                                alignItems: 'center',
-                            }}>
-                                <h3 className="font-semibold mb-1" style={{
-                                    fontSize: '14px',
-                                    flexGrow: '1',
-                                }}>Triscupid Regurgitation (Peak pressure gradient)</h3>
-                                <p
-                                    style={{
-                                        width: '60%',
-                                        border: '1px solid black',
-                                        borderRadius: '5px',
-                                        padding: '10px',
-                                    }}>{testRecord.triscupid_regurg_press}</p>
-                            </div>
-                            <div className="border p-2 rounded" style={{
-                                display: 'flex',
-                                justifyContent: 'start',
-                                alignItems: 'center',
-                            }}>
-                                <h3 className="font-semibold mb-1" style={{
-                                    fontSize: '14px',
-                                    flexGrow: '1',
-                                }}>Mitral Regurgitation (Peak Velocity)</h3>
-                                <p
-                                    style={{
-                                        width: '60%',
-                                        border: '1px solid black',
-                                        borderRadius: '5px',
-                                        padding: '10px',
-                                    }}>{testRecord.mitral_regurg_peak}</p>
-                            </div>
-                            <div className="border p-2 rounded" style={{
-                                display: 'flex',
-                                justifyContent: 'start',
-                                alignItems: 'center',
-                            }}>
-                                <h3 className="font-semibold mb-1" style={{
-                                    fontSize: '14px',
-                                    flexGrow: '1',
-                                }}>Mitral Regurgitation (Pressure Gradient)</h3>
-                                <p style={{
-                                    width: '60%',
-                                    border: '1px solid black',
-                                    borderRadius: '5px',
-                                    padding: '10px',
-                                }}>{testRecord.mitral_regurg_press}</p>
-                            </div>
-                            <div className="border p-2 rounded" style={{
-                                display: 'flex',
-                                justifyContent: 'start',
-                                alignItems: 'center',
-                            }}>
-                                <h3 className="font-semibold mb-1" style={{
-                                    fontSize: '14px',
-                                    flexGrow: '1',
-                                }}>Aortic Regurgitation (Peak Velocity)</h3>
-                                <p
-                                    style={{
-                                        width: '60%',
-                                        border: '1px solid black',
-                                        borderRadius: '5px',
-                                        padding: '10px',
-                                    }}>{testRecord.aortic_regurg_peak}</p>
-                            </div>
-                            <div className="border p-2 rounded" style={{
-                                display: 'flex',
-                                justifyContent: 'start',
-                                alignItems: 'center',
-                            }}>
-                                <h3 className="font-semibold mb-1" style={{
-                                    fontSize: '14px',
-                                    flexGrow: '1',
-                                }}>Aortic Regurgitation (Pressure Gradient)</h3>
-                                <p
-                                    style={{
-                                        width: '60%',
-                                        border: '1px solid black',
-                                        borderRadius: '5px',
-                                        padding: '10px',
-                                    }}>{testRecord.aortic_regurg_press}</p>
-                            </div>
-                            <div className="border p-2 rounded" style={{
-                                display: 'flex',
-                                justifyContent: 'start',
-                                alignItems: 'center',
-                            }}>
-                                <h3 className="font-semibold mb-1" style={{
-                                    fontSize: '14px',
-                                    flexGrow: '1',
-                                }}>Mitral Stenosis(Valve Area)</h3>
-                                <p
-                                    style={{
-                                        width: '60%',
-                                        border: '1px solid black',
-                                        borderRadius: '5px',
-                                        padding: '10px',
-                                    }}>{testRecord.mitral_stenosis}</p>
-                            </div>
-                            <div className="border p-2 rounded" style={{
-                                display: 'flex',
-                                justifyContent: 'start',
-                                alignItems: 'center',
-                            }}>
-                                <h3 className="font-semibold mb-1" style={{
-                                    fontSize: '14px',
-                                    flexGrow: '1',
-                                }}>Inferior Vena Cava (Diameter in Inspiration)</h3>
-                                <p
-                                    style={{
-                                        width: '60%',
-                                        border: '1px solid black',
-                                        borderRadius: '5px',
-                                        padding: '10px',
-                                    }}>{testRecord.inferior_vena_cava_insp}</p>
-                            </div>
-                            <div className="border p-2 rounded" style={{
-                                display: 'flex',
-                                justifyContent: 'start',
-                                alignItems: 'center',
-                            }}>
-                                <h3 className="font-semibold mb-1" style={{
-                                    fontSize: '14px',
-                                    flexGrow: '1',
-                                }}>Inferior Vena Cava (Diameter in Expiration)</h3>
-                                <p
-                                    style={{
-                                        width: '60%',
-                                        border: '1px solid black',
-                                        borderRadius: '5px',
-                                        padding: '10px',
-                                    }}>{testRecord.inferior_vena_cava_expi}</p>
-                            </div>
-                            <div className="border p-2 rounded" style={{
-                                display: 'flex',
-                                justifyContent: 'start',
-                                alignItems: 'center',
-                            }}>
-                                <h3 className="font-semibold mb-1" style={{
-                                    fontSize: '14px',
-                                    flexGrow: '1',
-                                }}>Inferior Vena Cava (Diameter with valsalva manoeuvre)</h3>
-                                <p
-                                    style={{
-                                        width: '60%',
-                                        border: '1px solid black',
-                                        borderRadius: '5px',
-                                        padding: '10px',
-                                    }}>{testRecord.inferior_vena_cava_diam}</p>
-                            </div>
-                            <div className="border p-2 rounded" style={{
-                                display: 'flex',
-                                justifyContent: 'start',
-                                alignItems: 'center',
-                            }}>
-                                <h3 className="font-semibold mb-1" style={{
-                                    fontSize: '14px',
-                                    flexGrow: '1',
-                                }}>Est. Right Atrial Pressure</h3>
-                                <p
-                                    style={{
-                                        width: '60%',
-                                        border: '1px solid black',
-                                        borderRadius: '5px',
-                                        padding: '10px',
-                                    }}>{testRecord.est_right}</p>
-                            </div>
-                        </div>
 
                         <div className="space-y-4">
                             <div className="border p-4 rounded" style={{

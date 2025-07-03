@@ -1,10 +1,9 @@
-
 import { NavMain } from '@/components/nav-main';
 
 import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import {  LayoutGrid, UsersIcon, ListChecks } from 'lucide-react';
+import { LayoutGrid, ListChecks, UsersIcon } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -14,18 +13,16 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
-        title: 'Patients',
-        href:'/patients/',
-        icon: UsersIcon
+        title: 'Create New Test',
+        href: '/patients/create',
+        icon: ListChecks,
     },
     {
-        title: 'Add Tests',
-        href: '/patients/create',
-        icon: ListChecks
-    }
+        title: 'Test List',
+        href: '/patients/',
+        icon: UsersIcon,
+    },
 ];
-
-
 
 export function AppSidebar() {
     return (
@@ -45,8 +42,6 @@ export function AppSidebar() {
             <SidebarContent>
                 <NavMain items={mainNavItems} />
             </SidebarContent>
-
-
         </Sidebar>
     );
 }

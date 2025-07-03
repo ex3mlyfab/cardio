@@ -1,7 +1,7 @@
 
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import {
     Table,
     TableBody,
@@ -11,7 +11,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Printer } from "lucide-react";
+import { Printer, FilePenLine } from "lucide-react";
 import { useCallback } from "react";
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -25,8 +25,9 @@ const breadcrumbs: BreadcrumbItem[] = [
     }
 ];
 
-export default function ShowTest({testRecord }: {
+export default function ShowTest({ testRecord }: {
     testRecord: {
+        id:string;
         test_date: string;
         weight: number;
         wc_cm: number;
@@ -75,12 +76,12 @@ export default function ShowTest({testRecord }: {
         inferior_vena_cava_diam: string;
         est_right: string;
         pericardium: string;
-        pasp:string;
-        mvsp:string;
-        mpap:string;
-        summary:string;
-        sign:string;
-        conclusion:string;
+        pasp: string;
+        mvsp: string;
+        mpap: string;
+        summary: string;
+        sign: string;
+        conclusion: string;
         patient?: {
             hospital_id: string;
             surname: string;
@@ -124,14 +125,6 @@ export default function ShowTest({testRecord }: {
                                             ">
 
 
-                               <img
-            src="/fmc_logo.jpeg" style="height: 100px; width: 100px; object-fit: cover; border-radius: 10%; margin-bottom:1px;"
-            alt="FMC Logo" />
-                                 <h2 style="padding:0; margin:0;">FEDERAL MEDICAL CENTRE</h2>
-
-                                 <h5 style="padding:0;margin:0;">JABI - AIRPORT ROAD ABUJA </h5>
-
-                                 <h5 style="padding:0;margin:0;">ECHOCARDIOGRAPHY LABORATORY</h5>
 
 
                                </div>
@@ -152,83 +145,125 @@ export default function ShowTest({testRecord }: {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Test Record Details" />
-            <div className="flex justify-end mb-4">
-                <Button
-                    onClick={handlePrint}
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                    <Printer className="h-4 w-4 mr-2" />
+            <div className="mb-4 flex justify-between">
+                <Button variant="secondary">
+                    <Link href={route('patients.editTest', testRecord.id)} className="flex justify-center">
+                        <FilePenLine className="mr-1 h-4 w-4" />
+                        Update
+                    </Link>
+                </Button>
+                <Button onClick={handlePrint} className="bg-blue-600 text-white hover:bg-blue-700">
+                    <Printer className="mr-2 h-4 w-4" />
                     Print Test Record
                 </Button>
             </div>
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4" id='testRecord'>
-
+            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4" id="testRecord">
                 {/* Form Container */}
                 <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl border p-4 md:p-6">
                     <div className="space-y-8">
-                        <div>
-                            <h2 className="mb-4 text-xl font-semibold">Patient Details</h2>
-                            <Table className='border'>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="border p-2">Hospital No</TableHead>
-                                        <TableHead className="border p-2">Surname</TableHead>
-                                        <TableHead className="border p-2">Other Names</TableHead>
-                                        <TableHead className="border p-2 w-[100px]">Sex</TableHead>
-                                        <TableHead className="border p-2">DOB</TableHead>
-                                        <TableHead className="border p-2">NICL</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    <TableRow>
-                                        <TableCell className="border p-2">{testRecord.patient?.hospital_id || 'N/A'}</TableCell>
-                                        <TableCell className="border p-2">{testRecord?.patient?.surname || 'N/A'}</TableCell>
-                                        <TableCell className="border p-2">{testRecord?.patient?.other_names || 'N/A'}</TableCell>
-                                        <TableCell className="border p-2">{testRecord?.patient?.gender || 'N/A'}</TableCell>
-                                        <TableCell className="border p-2">{testRecord?.patient?.date_of_birth || 'N/A'}</TableCell>
-                                        <TableCell className="border p-2">{testRecord?.patient?.nicl || 'N/A'}</TableCell>
-                                    </TableRow>
-                                </TableBody>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="border p-2">TEST DATE</TableHead>
-                                        <TableHead className="border p-2">WEIGHT(kg)</TableHead>
-                                        <TableHead className="border p-2">WC(cm)</TableHead>
-                                        <TableHead className="border p-2 w-[100px]">HEIGHT(cm)</TableHead>
-                                        <TableHead className="border p-2">BSA(m<sup>2</sup>)</TableHead>
-                                        <TableHead className="border p-2">BP(mmHg)</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    <TableRow>
-                                        <TableCell className="border p-2">{testRecord.test_date}</TableCell>
-                                        <TableCell className="border p-2">{testRecord.weight}</TableCell>
-                                        <TableCell className="border p-2">{testRecord.wc_cm}</TableCell>
-                                        <TableCell className="border p-2">{testRecord.height}</TableCell>
-                                        <TableCell className="border p-2">{testRecord.bsa}</TableCell>
-                                        <TableCell className="border p-2">{testRecord.blood_pressure}</TableCell>
-                                    </TableRow>
-                                </TableBody>
-                            </Table>
+                        <div className="mb-4 flex items-center justify-between" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', alignItems: 'center' }}>
+                            <div
+                                className="flex flex-col items-center justify-center"
+                                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', border: '1px solid #ddd', padding: '10px', borderRadius: '8px' }}
+                            >
+                                <img src="/fmc_logo.jpeg" style={{ width: '100px', height: '100px' }} alt="FMC Logo" />
+                                <h6 className="p-o m-0" style={{ margin: 0, padding: 0, fontSize: '11px', textAlign: 'center' }}>
+                                    FEDERAL MEDICAL CENTRE
+                                </h6>
+
+                                <h6 className="p-o m-0" style={{ margin: 0, padding: 0, fontSize: '11px' }}>
+                                    JABI - AIRPORT ROAD ABUJA{' '}
+                                </h6>
+
+                                <h6 className="p-o m-0" style={{ margin: 0, padding: 0, fontSize: '11px' }}>
+                                    ECHOCARDIOGRAPHY LABORATORY
+                                </h6>
+                            </div>
+                            <div
+                                className="flex flex-col items-center justify-center"
+                                style={{ gridColumn: 'span 2', alignItems: 'center', justifyContent: 'center' }}
+                            >
+                                <h2 className="mb-4 text-xl font-semibold">Patient Details</h2>
+                                <Table className="border">
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead className="border p-2">Hospital No</TableHead>
+                                            <TableHead className="border p-2">Surname</TableHead>
+                                            <TableHead className="border p-2">Other Names</TableHead>
+                                            <TableHead className="w-[100px] border p-2">Sex</TableHead>
+                                            <TableHead className="border p-2">DOB</TableHead>
+                                            <TableHead className="border p-2">NICL</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        <TableRow>
+                                            <TableCell className="border p-2">{testRecord.patient?.hospital_id || 'N/A'}</TableCell>
+                                            <TableCell className="border p-2">{testRecord?.patient?.surname || 'N/A'}</TableCell>
+                                            <TableCell className="border p-2">{testRecord?.patient?.other_names || 'N/A'}</TableCell>
+                                            <TableCell className="border p-2">{testRecord?.patient?.gender || 'N/A'}</TableCell>
+                                            <TableCell className="border p-2">{testRecord?.patient?.date_of_birth || 'N/A'}</TableCell>
+                                            <TableCell className="border p-2">{testRecord?.patient?.nicl || 'N/A'}</TableCell>
+                                        </TableRow>
+                                    </TableBody>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead className="border p-2">TEST DATE</TableHead>
+                                            <TableHead className="border p-2">WEIGHT(kg)</TableHead>
+                                            <TableHead className="border p-2">WC(cm)</TableHead>
+                                            <TableHead className="w-[100px] border p-2">HEIGHT(cm)</TableHead>
+                                            <TableHead className="border p-2">
+                                                BSA(m<sup>2</sup>)
+                                            </TableHead>
+                                            <TableHead className="border p-2">BP(mmHg)</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        <TableRow>
+                                            <TableCell className="border p-2">{testRecord.test_date}</TableCell>
+                                            <TableCell className="border p-2">{testRecord.weight}</TableCell>
+                                            <TableCell className="border p-2">{testRecord.wc_cm}</TableCell>
+                                            <TableCell className="border p-2">{testRecord.height}</TableCell>
+                                            <TableCell className="border p-2">{testRecord.bsa}</TableCell>
+                                            <TableCell className="border p-2">{testRecord.blood_pressure}</TableCell>
+                                        </TableRow>
+                                    </TableBody>
+                                </Table>
+                            </div>
                         </div>
 
-                        <div className="flex justify-evenly mt-1 gap-2 align-center" style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(4, 1fr)',
-                            gap: '20px',
-                            fontSize: '14px',
-                            justifyContent: 'start',
-                            alignItems: 'center',
-                        }}>
-                            <h2 className="text-xl font-semibold mt-2" style={{
-                                fontSize: '12px',
-                                paddingTop: '1px'
-                            }}>Indication for study:</h2>
-                            <div className="flex-1 p-2 border rounded" style={{
-                                gridColumn: 'span 3',
-                            }}>{testRecord.indication}</div>
+                        <div
+                            className="align-center mt-1 flex justify-evenly gap-2"
+                            style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(4, 1fr)',
+                                gap: '20px',
+                                fontSize: '14px',
+                                justifyContent: 'start',
+                                alignItems: 'center',
+                                border: '1px solid #ddd',
+                                padding: '10px',
+                                borderRadius: '8px',
+                            }}
+                        >
+                            <h2
+                                className="mt-2 text-xl font-semibold"
+                                style={{
+                                    fontSize: '12px',
+                                    paddingTop: '1px',
+                                }}
+                            >
+                                Indication for study:
+                            </h2>
+                            <div
+                                className="flex-1 rounded border p-2"
+                                style={{
+                                    gridColumn: 'span 3',
+                                }}
+                            >
+                                {testRecord.indication}
+                            </div>
                         </div>
-                        <Table className='border'>
+                        <Table className="border">
                             <TableBody>
                                 <TableRow>
                                     <TableCell className="border p-1">Aortic Root</TableCell>
@@ -279,7 +314,9 @@ export default function ShowTest({testRecord }: {
                                     <TableCell className="border p-1">{testRecord.lvpws}</TableCell>
                                 </TableRow>
                                 <TableRow>
-                                    <TableCell className="border p-1">RAA(cm<sup>2</sup>)</TableCell>
+                                    <TableCell className="border p-1">
+                                        RAA(cm<sup>2</sup>)
+                                    </TableCell>
                                     <TableCell className="border p-1">27 - 33</TableCell>
                                     <TableCell className="border p-1">{testRecord.raa}</TableCell>
                                     <TableCell className="border p-1">FS(%)</TableCell>
@@ -287,7 +324,9 @@ export default function ShowTest({testRecord }: {
                                     <TableCell className="border p-1">{testRecord.fs}</TableCell>
                                 </TableRow>
                                 <TableRow>
-                                    <TableCell className="border p-1">LAA(cm<sup>2</sup>)</TableCell>
+                                    <TableCell className="border p-1">
+                                        LAA(cm<sup>2</sup>)
+                                    </TableCell>
                                     <TableCell className="border p-1">&le; 20</TableCell>
                                     <TableCell className="border p-1">{testRecord.laa}</TableCell>
                                     <TableCell className="border p-1">EF(%)</TableCell>
@@ -296,7 +335,7 @@ export default function ShowTest({testRecord }: {
                                 </TableRow>
                             </TableBody>
                         </Table>
-                        <Table className='mt-1'>
+                        <Table className="mt-1">
                             <TableBody>
                                 <TableRow>
                                     <TableCell className="border p-1">E Wave (m/s)</TableCell>
@@ -340,180 +379,200 @@ export default function ShowTest({testRecord }: {
                                 </TableRow>
                             </TableBody>
                         </Table>
-                        <Table className='mt-1'>
+                        <Table className="mt-1">
                             <TableBody>
                                 <TableRow>
                                     <TableCell className="border p-1">Aortic Valve(Peak vel)</TableCell>
 
-                                    <TableCell className="border p-1">{testRecord.aortic_valve_peak}</TableCell>
+                                    <TableCell className="border p-1">{testRecord.aortic_valve_peak} m/s</TableCell>
                                     <TableCell className="border p-1">Pulmonary valve (Peak vel)</TableCell>
 
-                                    <TableCell className="border p-1">{testRecord.pulmonary_valve_peak}</TableCell>
+                                    <TableCell className="border p-1">{testRecord.pulmonary_valve_peak} m/s</TableCell>
                                 </TableRow>
                                 <TableRow>
                                     <TableCell className="border p-1">Aortic valve (pressure gradient)</TableCell>
 
-                                    <TableCell className="border p-1">{testRecord.aortic_valve_press}</TableCell>
+                                    <TableCell className="border p-1">{testRecord.aortic_valve_press} mmHg</TableCell>
                                     <TableCell className="border p-1">Pulmonary valve (pressure gradient)</TableCell>
 
-                                    <TableCell className="border p-1">{testRecord.pulmonary_valve_press}</TableCell>
+                                    <TableCell className="border p-1">{testRecord.pulmonary_valve_press} mmHg</TableCell>
                                 </TableRow>
                             </TableBody>
                         </Table>
-                        <Table className='nt-1'>
+                        <Table className="nt-1">
                             <TableBody>
                                 <TableRow>
-                                    <TableCell className="border p-1"> TRV<sub>max</sub></TableCell>
                                     <TableCell className="border p-1">
-                                        {testRecord.triscupid_regurg_peak}
+                                        {' '}
+                                        TRV<sub>max</sub>
                                     </TableCell>
+                                    <TableCell className="border p-1">{testRecord.triscupid_regurg_peak}</TableCell>
                                     <TableCell className="border p-1">
                                         TR<sub>max</sub>PG
                                     </TableCell>
+                                    <TableCell className="border p-1">{testRecord.triscupid_regurg_press}</TableCell>
                                     <TableCell className="border p-1">
-                                        {testRecord.triscupid_regurg_press}
+                                        {' '}
+                                        MRV <sub>max</sub>
                                     </TableCell>
-                                    <TableCell className="border p-1"> MRV <sub>max</sub></TableCell>
                                     <TableCell className="border p-1"> {testRecord.mitral_regurg_peak}</TableCell>
                                 </TableRow>
                                 <TableRow>
-                                    <TableCell className="border p-1"> MR<sub>max</sub>PG</TableCell>
                                     <TableCell className="border p-1">
-                                        {testRecord.mitral_regurg_press}
+                                        {' '}
+                                        MR<sub>max</sub>PG
                                     </TableCell>
+                                    <TableCell className="border p-1">{testRecord.mitral_regurg_press}</TableCell>
                                     <TableCell className="border p-1">
                                         ARV<sub>max</sub>
                                     </TableCell>
-                                    <TableCell className="border p-1">
-                                        {testRecord.aortic_regurg_peak}
-                                    </TableCell>
+                                    <TableCell className="border p-1">{testRecord.aortic_regurg_peak}</TableCell>
                                     <TableCell className="border p-1">
                                         AR<sub>max</sub>PG
                                     </TableCell>
-                                    <TableCell className="border p-1">
-                                        {testRecord.aortic_regurg_press}
-                                    </TableCell>
+                                    <TableCell className="border p-1">{testRecord.aortic_regurg_press}</TableCell>
                                 </TableRow>
                                 <TableRow>
-                                    <TableCell className="border p-1">
-                                        Mitral Stenosis (valve Area)
-                                    </TableCell>
-                                    <TableCell className="border p-1">
-                                        {testRecord.mitral_stenosis}
-                                    </TableCell>
+                                    <TableCell className="border p-1">Mitral Stenosis (valve Area)</TableCell>
+                                    <TableCell className="border p-1">{testRecord.mitral_stenosis}</TableCell>
                                     <TableCell className="border p-1">
                                         IVC<sub>(ins)</sub>
                                     </TableCell>
-                                    <TableCell className="border p-1">
-                                        {testRecord.inferior_vena_cava_insp}
-                                    </TableCell>
+                                    <TableCell className="border p-1">{testRecord.inferior_vena_cava_insp}</TableCell>
                                     <TableCell className="border p-1">
                                         IVC<sub>(ex)</sub>
                                     </TableCell>
-                                    <TableCell className="border p-1">
-                                        {testRecord.inferior_vena_cava_expi}
-                                    </TableCell>
+                                    <TableCell className="border p-1">{testRecord.inferior_vena_cava_expi}</TableCell>
                                 </TableRow>
                                 <TableRow>
                                     <TableCell className="border p-1">
                                         IVC<sub>(diameter with valva manoeuvre)</sub>
                                     </TableCell>
-                                    <TableCell className="border p-1">
-                                        {testRecord.inferior_vena_cava_diam}
-                                    </TableCell>
-                                    <TableCell className="border p-1">
-                                        Est. Right Aterial pressure
-                                    </TableCell>
-                                    <TableCell className="border p-1">
-                                        {testRecord.est_right}
-                                    </TableCell>
-                                    <TableCell className="border p-1">
-                                        PASP
-                                    </TableCell>
-                                    <TableCell className="border p-1">
-                                        {testRecord.pasp}
-                                    </TableCell>
+                                    <TableCell className="border p-1">{testRecord.inferior_vena_cava_diam}</TableCell>
+                                    <TableCell className="border p-1">Est. Right Aterial pressure</TableCell>
+                                    <TableCell className="border p-1">{testRecord.est_right}</TableCell>
+                                    <TableCell className="border p-1">PASP</TableCell>
+                                    <TableCell className="border p-1">{testRecord.pasp}</TableCell>
                                 </TableRow>
                                 <TableRow>
-                                    <TableCell className="border p-1">
-                                        MPAP
-                                    </TableCell>
-                                    <TableCell className="border p-1">
-                                        {testRecord.mpap}
-                                    </TableCell>
-                                    <TableCell className="border p-1">
-                                        RVSP
-                                    </TableCell>
-                                    <TableCell className="border p-1">
-                                        {testRecord.mvsp}
-                                    </TableCell>
+                                    <TableCell className="border p-1">MPAP</TableCell>
+                                    <TableCell className="border p-1">{testRecord.mpap}</TableCell>
+                                    <TableCell className="border p-1">RVSP</TableCell>
+                                    <TableCell className="border p-1">{testRecord.mvsp}</TableCell>
                                     <TableCell className="border p-1"> </TableCell>
                                     <TableCell className="border p-1"> </TableCell>
                                 </TableRow>
                             </TableBody>
                         </Table>
 
-
                         <div className="space-y-4">
-                            <div className="border p-4 rounded" style={{
-                                display: 'grid',
-                                gridTemplateColumns: 'repeat(4, 1fr)',
-                                gap: '20px',
-                                fontSize: '14px',
-                                justifyContent: 'start',
-                                alignItems: 'center',
-                            }}>
-                                <h3 className="font-semibold mb-2" style={{
+                            <div
+                                className="rounded border p-4"
+                                style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(4, 1fr)',
+                                    gap: '20px',
                                     fontSize: '14px',
-                                }}>Pericardium</h3>
-                                <p style={{
-                                    gridColumn: 'span 3',
-                                }}>{testRecord.pericardium}</p>
+                                    justifyContent: 'start',
+                                    alignItems: 'center',
+                                }}
+                            >
+                                <h3
+                                    className="mb-2 font-semibold"
+                                    style={{
+                                        fontSize: '14px',
+                                    }}
+                                >
+                                    Pericardium
+                                </h3>
+                                <p
+                                    style={{
+                                        gridColumn: 'span 3',
+                                    }}
+                                >
+                                    {testRecord.pericardium}
+                                </p>
                             </div>
-                            <div className="border p-4 rounded" style={{
-                                display: 'grid',
-                                gridTemplateColumns: 'repeat(4, 1fr)',
-                                gap: '20px',
-                                fontSize: '14px',
-                                justifyContent: 'start',
-                                alignItems: 'center',
-                            }}>
-                                <h3 className="font-semibold mb-2" style={{
+                            <div
+                                className="rounded border p-4"
+                                style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(4, 1fr)',
+                                    gap: '20px',
                                     fontSize: '14px',
-                                }}>Summary</h3>
-                                <p style={{
-                                    gridColumn: 'span 3',
-                                }}>{testRecord.summary}</p>
+                                    justifyContent: 'start',
+                                    alignItems: 'center',
+                                }}
+                            >
+                                <h3
+                                    className="mb-2 font-semibold"
+                                    style={{
+                                        fontSize: '14px',
+                                    }}
+                                >
+                                    Summary
+                                </h3>
+                                <p
+                                    style={{
+                                        gridColumn: 'span 3',
+                                    }}
+                                >
+                                    {testRecord.summary}
+                                </p>
                             </div>
-                            <div className="border p-4 rounded" style={{
-                                display: 'grid',
-                                gridTemplateColumns: 'repeat(4, 1fr)',
-                                gap: '20px',
-                                fontSize: '14px',
-                                justifyContent: 'start',
-                                alignItems: 'center',
-                            }}>
-                                <h3 className="font-semibold mb-2" style={{
+                            <div
+                                className="rounded border p-4"
+                                style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(4, 1fr)',
+                                    gap: '20px',
                                     fontSize: '14px',
-                                }}>Conclusion</h3>
-                                <p style={{
-                                    gridColumn: 'span 3',
-                                }}>{testRecord.conclusion}</p>
+                                    justifyContent: 'start',
+                                    alignItems: 'center',
+                                }}
+                            >
+                                <h3
+                                    className="mb-2 font-semibold"
+                                    style={{
+                                        fontSize: '14px',
+                                    }}
+                                >
+                                    Conclusion
+                                </h3>
+                                <p
+                                    style={{
+                                        gridColumn: 'span 3',
+                                    }}
+                                >
+                                    {testRecord.conclusion}
+                                </p>
                             </div>
-                            <div className="border p-4 rounded" style={{
-                                display: 'grid',
-                                gridTemplateColumns: 'repeat(4, 1fr)',
-                                gap: '20px',
-                                fontSize: '14px',
-                                justifyContent: 'start',
-                                alignItems: 'center',
-                            }}>
-                                <h3 className="font-semibold mb-2" style={{
+                            <div
+                                className="rounded border p-4"
+                                style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(4, 1fr)',
+                                    gap: '20px',
                                     fontSize: '14px',
-                                }} >Signed</h3>
-                                <p style={{
-                                    gridColumn: 'span 3',
-                                }}>{testRecord.sign}</p>
+                                    justifyContent: 'start',
+                                    alignItems: 'center',
+                                }}
+                            >
+                                <h3
+                                    className="mb-2 font-semibold"
+                                    style={{
+                                        fontSize: '14px',
+                                    }}
+                                >
+                                    Signed
+                                </h3>
+                                <p
+                                    style={{
+                                        gridColumn: 'span 3',
+                                    }}
+                                >
+                                    {testRecord.sign}
+                                </p>
                             </div>
                         </div>
                     </div>

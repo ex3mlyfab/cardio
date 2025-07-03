@@ -81,14 +81,17 @@ export default function PatientsIndex({ tests, filters, flash }: PatientsIndexPr
 
     // Use useCallback to prevent recreation of the debounced function on each render
     const debouncedSearch = useCallback(
-        debounce((value: string) => {
-            router.get(
-                route('patients.index'),
-                { search: value, filter },
-                { preserveState: true, replace: true }
-            );
-        }, 300),
-        [filter]
+        debounce(
+            (value: string) => {
+                router.get(
+                    route('patients.index'),
+                    { search: value, filter },
+                    { preserveState: true, replace: true }
+                );
+            },
+            300
+        ),
+        [filter, router]
     );
 
     // Handle search input changes with debounce
@@ -178,6 +181,7 @@ export default function PatientsIndex({ tests, filters, flash }: PatientsIndexPr
                                                 {new Date(test.test_date).toLocaleDateString()}
                                             </TableCell>
                                             <TableCell>
+                                                <div className="flex space-x-2 justify-between items-center">
                                                 <Button variant="outline" size="sm" asChild>
                                                     <Link href={route('patients.showTest', test.id)}>
                                                         <FileText className="h-4 w-4 mr-1" />
@@ -190,6 +194,18 @@ export default function PatientsIndex({ tests, filters, flash }: PatientsIndexPr
                                                         Update
                                                     </Link>
                                                 </Button>
+                                                <Button
+                                                    variant="destructive"
+                                                    size="sm"
+                                                    onClick={() => {
+                                                        if (confirm('Are you sure you want to delete this test record? \n This action cannot be undone.')) {
+                                                            router.delete(route('patients.deleteTest', test.id));
+                                                        }
+                                                    }}
+                                                >
+                                                    Delete
+                                                </Button>
+                                                </div>
                                             </TableCell>
                                         </TableRow>
                                     ))

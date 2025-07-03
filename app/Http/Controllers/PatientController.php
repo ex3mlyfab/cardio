@@ -13,7 +13,31 @@ class PatientController extends Controller
 {
     public function index()
     {
+
+        $thirtyDay = now()->subDays(30);
+        $search = request('search', '');
+        $filter = request('filter', 'all');
         $query = TestRecord::with('patient')
+            ->when($search, function ($query, $search) {
+                $query->whereHas('patient', function ($query) use ($search) {
+                    $query->where('surname', 'like', "%{$search}%")
+                        ->orWhere('other_names', 'like', "%{$search}%")
+                        ->orWhere('hospital_id', 'like', "%{$search}%");
+                });
+            })
+            ->when($filter === 'recent', function ($query) use ($thirtyDay) {
+                $query->where('created_at', '>=', $thirtyDay);
+            })
+            ->when($filter === 'male', function ($query) {
+                $query->whereHas('patient', function ($query) {
+                    $query->where('gender', 'like', 'male');
+                });
+            })
+            ->when($filter === 'female', function ($query) {
+                $query->whereHas('patient', function ($query) {
+                    $query->where('gender', 'like', 'female');
+                });
+            })
             ->orderBy('created_at', 'desc');
         if(request()->has('search')){
 
@@ -58,7 +82,7 @@ class PatientController extends Controller
             'weight' => 'required|numeric|max:255', // Consider 'numeric' if applicable
             'height' => 'required|numeric|max:255', // Consider 'numeric' if applicable
             'bsa' => 'required|numeric|max:255', // Consider 'numeric' if applicable
-            'blood_pressure' => 'required|numeric|max:255',
+            'blood_pressure' => 'nullable|numeric|max:255',
             'wc_cm' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
             'indication' => 'required|string|max:255',
             // Dimension
@@ -112,6 +136,7 @@ class PatientController extends Controller
             'summary' => 'nullable|string', // Text fields might not need max length
             'conclusion' => 'nullable|string', // Text fields might not need max length
             'sign' => 'nullable|string|max:255',
+            'doctor_name' => 'nullable|string|max:255', // Optional field for doctor's name
         ]);
         $patient = Patient::firstOrCreate([
             'hospital_id' => $validated['hospital_id']],[
@@ -179,17 +204,16 @@ class PatientController extends Controller
             'pericardium' => $validated['pericardium'],
             'summary' => $validated['summary'],
             'conclusion' => $validated['conclusion'],
-            'sign' => $validated['sign'],
+            'sign' => $validated['sign'] === 'others' ? $validated['doctor_name'] : $validated['sign'],
         ]);
 
         // Add logic to create the TestRecord using $validated data + user_id
         // e.g., TestRecord::create(array_merge($validated, ['user_id' => auth()->id()]));
 
         // Redirect or return response
-       return response()->json([
-        'id' => $testRecord->id,
-        'success' => 'Added successfully'
-       ]);
+       return Inertia::render('patients/showTest', [
+            'testRecord' => $testRecord,
+        ]);
     }
 
     public function show(Patient $patient)
@@ -231,7 +255,7 @@ class PatientController extends Controller
             'weight' => 'required|numeric',
             'height' => 'required|numeric',
             'bsa' => 'required|numeric',
-            'blood_pressure' => 'required|string|max:255',
+            'blood_pressure' => 'nullable|string|max:255',
             'wc_cm' => 'nullable|numeric',
             'indication' => 'required|string|max:255',
             // Dimension
@@ -284,11 +308,15 @@ class PatientController extends Controller
             'summary' => 'nullable|string',
             'conclusion' => 'nullable|string',
             'sign' => 'nullable|string|max:255',
+            'doctor_name' => 'nullable|string|max:255', // Optional field for doctor's name
         ]);
-
-        $testRecord->update($validated);
-
-        return redirect()->route('patients.showTest', $testRecord->id)->with('success', 'Test record updated successfully');
+        // Update the test record with the validated data
+        $validated['sign'] = $validated['sign'] === 'others' ? $validated['doctor_name'] : $validated['sign'];
+          $testRecord->update($validated);
+        $testRecord->load('patient');
+        return Inertia::render('patients/showTest', [
+            'testRecord' => $testRecord
+        ]);
     }
     public function update(Request $request, Patient $patient)
     {
@@ -297,6 +325,11 @@ class PatientController extends Controller
     public function destroy(Patient $patient)
     {
         //
+    }
+    public function deleteTestRecord(TestRecord $testRecord)
+    {
+        $testRecord->delete();
+        return redirect()->route('patients.index')->with('success', 'Test record deleted successfully.');
     }
 
 }

@@ -25,7 +25,58 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import * as TabsPrimitive from "@radix-ui/react-tabs";
+import { cn } from '@/lib/utils';
 
+// Custom Tabs components with styling
+const Tabs = TabsPrimitive.Root;
+
+const TabsList = React.forwardRef<
+    React.ElementRef<typeof TabsPrimitive.List>,
+    React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
+>(({ className, ...props }, ref) => (
+    <TabsPrimitive.List
+        ref={ref}
+        className={cn(
+            "bg-muted text-muted-foreground inline-flex h-10 items-center justify-center rounded-md p-1",
+            className
+        )}
+        {...props}
+    />
+));
+TabsList.displayName = TabsPrimitive.List.displayName;
+
+import React from 'react';
+
+const TabsTrigger = React.forwardRef<
+    React.ElementRef<typeof TabsPrimitive.Trigger>,
+    React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
+>(({ className, ...props }, ref) => (
+    <TabsPrimitive.Trigger
+        ref={ref}
+        className={cn(
+            "ring-offset-background focus-visible:ring-ring data-[state=active]:bg-background data-[state=active]:text-foreground inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:shadow-sm",
+            className
+        )}
+        {...props}
+    />
+));
+TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
+
+const TabsContent = React.forwardRef<
+    React.ElementRef<typeof TabsPrimitive.Content>,
+    React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>
+>(({ className, ...props }, ref) => (
+    <TabsPrimitive.Content
+        ref={ref}
+        className={cn(
+            "ring-offset-background focus-visible:ring-ring mt-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+            className
+        )}
+        {...props}
+    />
+));
+TabsContent.displayName = TabsPrimitive.Content.displayName;
 
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -103,6 +154,7 @@ export default function EditTestRecordPage({ data: testRecord }: { data: {
     summary: string;
     conclusion: string;
     sign: string;
+    doctor_name?: string; // Optional field for doctor's name
 }}) {
     const { data, setData, put, processing, errors } = useForm({
         // Patient fields
@@ -170,14 +222,77 @@ export default function EditTestRecordPage({ data: testRecord }: { data: {
         summary: testRecord.summary || '',
         conclusion: testRecord.conclusion || '',
         sign: testRecord.sign || '',
+        doctor_name: testRecord.doctor_name || '', // Optional field for doctor's name
     });
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        // Prevent form submission when Enter key is pressed
+        if (e.key === 'Enter') {
+            e.preventDefault();
+        }
+    };
+    const handleHospitalIdBlur: FocusEventHandler<HTMLInputElement> = async () => {
+        if (data.hospital_id && data.hospital_id.trim() !== '') {
+            console.log(data.hospital_id);
+            try {
+                // Assuming route() is globally available (e.g., from Ziggy)
+                const response = await fetch(route('patients.search', { patient: data.hospital_id }));
 
+                if (response.ok) {
+                    const patientData = await response.json();
+                    // Check if patientData is a non-empty object
+                    if (patientData && typeof patientData === 'object' && Object.keys(patientData).length > 0) {
+                        setData(currentData => ({
+                            ...currentData,
+                            surname: patientData.surname || '',
+                            other_names: patientData.other_names || '',
+                            gender: patientData.gender || '',
+                            date_of_birth: patientData.date_of_birth || '',
+                        }));
+                    } else {
+                        // Patient not found or empty response, clear fields
+                        setData(currentData => ({
+                            ...currentData,
+                            surname: '',
+                            other_names: '',
+                            gender: '',
+                            date_of_birth: '',
+                        }));
+                    }
+                } else {
+                    // Handle non-OK responses (e.g., 404 Not Found means patient doesn't exist)
+                    setData(currentData => ({
+                        ...currentData,
+                        surname: '',
+                        other_names: '',
+                        gender: '',
+                        date_of_birth: '',
+                    }));
+                }
+            } catch (error) {
+                console.error('Error fetching patient data:', error);
+                setData(currentData => ({
+                    ...currentData,
+                    surname: '',
+                    other_names: '',
+                    gender: '',
+                    date_of_birth: '',
+                }));
+            }
+        } else {
+            // If hospital_id is empty or only whitespace, clear the dependent fields
+            setData(currentData => ({
+                ...currentData,
+                surname: '',
+                other_names: '',
+                gender: '',
+                date_of_birth: '',
+            }));
+        }
+    };
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        put(route('patients.updateTestRecord', testRecord.id), {
+        put(route('patients.updateTest', testRecord.id), {
             onSuccess: () => {
-                // Redirect to the patient's test record page
-                window.location.href = route('patients.showTest', testRecord.id);
             },
         });
     };
@@ -263,431 +378,430 @@ export default function EditTestRecordPage({ data: testRecord }: { data: {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Edit Test Record" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-
                 {/* Form Container */}
                 <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl border p-4 md:p-6">
-                    <form onSubmit={submit} className="space-y-8">
-                        <div>
-                            <h2 className="mb-4 text-xl font-semibold">Patient Details</h2>
-                            <Table className='border'>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="border p-2">Hospital No</TableHead>
-                                        <TableHead className="border p-2">Surname</TableHead>
-                                        <TableHead className="border p-2">Other Names</TableHead>
-                                        <TableHead className="border p-2 w-[100px]">Sex</TableHead>
-                                        <TableHead className="border p-2">DOB</TableHead>
-                                        <TableHead className="border p-2">NICL</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    <TableRow>
-                                        <TableCell className="border p-2"> {renderInputField('hospital_id', '', 'text', 'Hospital Id', {
-                                            autoFocus: false,
-                                        })}</TableCell>
-                                        <TableCell className="border p-2"> {renderInputField('surname', '', 'text', 'Surname')}</TableCell>
-                                        <TableCell className="border p-2"> {renderInputField('other_names', '')}</TableCell>
-                                        <TableCell className="border p-2"> <div className="grid gap-2">
-                                            <div className="grid gap-2">
-                                                <Select
-                                                    value={data.gender}
-                                                    onValueChange={(value) => setData('gender', value)}
-                                                >
-                                                    <SelectTrigger className="w-[180px]">
-                                                        <SelectValue placeholder="Gender" />
-                                                    </SelectTrigger>
+                    <form onSubmit={submit} className="space-y-8" onKeyDown={handleKeyDown}>
+                        <Tabs defaultValue="patient-details" className="w-full">
+                            <TabsList className="mb-4 w-full justify-start">
+                                <TabsTrigger value="patient-details">Patient Details</TabsTrigger>
+                                <TabsTrigger value="dimensions">Dimensions</TabsTrigger>
+                                <TabsTrigger value="diastolic-function">Diastolic Function</TabsTrigger>
+                                <TabsTrigger value="report">Report</TabsTrigger>
+                            </TabsList>
 
-                                                    <SelectContent>
-                                                        <SelectItem value="male">Male</SelectItem>
-                                                        <SelectItem value="female">Female</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                                <InputError message={errors.gender} className="mt-2" />
-                                            </div>
+                            {/* Patient Details Tab */}
+                            <TabsContent value="patient-details" className="space-y-4">
+                                <div>
+                                    <h2 className="mb-4 text-xl font-semibold">Patient Details</h2>
+                                    <Table className="border">
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead className="border p-2">Hospital No</TableHead>
+                                                <TableHead className="border p-2">Surname</TableHead>
+                                                <TableHead className="border p-2">Other Names</TableHead>
+                                                <TableHead className="w-[100px] border p-2">Sex</TableHead>
+                                                <TableHead className="border p-2">DOB</TableHead>
+                                                <TableHead className="border p-2">NICL</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            <TableRow>
+                                                <TableCell className="border p-2">
+                                                    {' '}
+                                                    {renderInputField('hospital_id', '', 'text', 'Hospital Id', {
+                                                        autoFocus: true,
+                                                        onBlur: handleHospitalIdBlur,
+                                                    })}
+                                                </TableCell>
+                                                <TableCell className="border p-2"> {renderInputField('surname', '', 'text', 'Surname')}</TableCell>
+                                                <TableCell className="border p-2"> {renderInputField('other_names', '')}</TableCell>
+                                                <TableCell className="border p-2">
+                                                    <div className="grid gap-2">
+                                                        <Select value={data.gender} onValueChange={(value) => setData('gender', value)}>
+                                                            <SelectTrigger className="w-[180px]">
+                                                                <SelectValue placeholder="Gender" />
+                                                            </SelectTrigger>
 
-                                        </div> </TableCell>
-                                        <TableCell className="border p-2"> {renderInputField('date_of_birth', '', 'date')}</TableCell>
-                                        <TableCell className="border p-2">{renderInputField('nicl', '')}</TableCell>
-                                    </TableRow>
-                                </TableBody>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="border p-2">TEST DATE</TableHead>
-                                        <TableHead className="border p-2">WEIGHT(kg)</TableHead>
-                                        <TableHead className="border p-2">WC(cm)</TableHead>
-                                        <TableHead className="border p-2 w-[100px]">HEIGHT(cm)</TableHead>
-                                        <TableHead className="border p-2">BSA(m<sup>2</sup>)</TableHead>
-                                        <TableHead className="border p-2">BP(mmHg)</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    <TableRow>
-                                        <TableCell className="border p-2">
-                                            {renderInputField('test_date', '', 'date')}
-                                        </TableCell>
-                                        <TableCell className="border p-2"> {renderInputField('weight', '', 'nmber')}</TableCell>
-                                        <TableCell className="border p-2"> {renderInputField('wc_cm', '')}</TableCell>
-                                        <TableCell className="border p-2"> {renderInputField('height', '', 'number')} </TableCell>
-                                        <TableCell className="border p-2"> {renderInputField('bsa', '', 'number', '',{
-                                            onBlur: handleBSACalc
-                                        })}</TableCell>
-                                        <TableCell className="border p-2">{renderInputField('blood_pressure', '', 'number')}</TableCell>
-                                    </TableRow>
-                                </TableBody>
-                            </Table>
-                        </div>
-
-                        <div className="flex justify-evenly mt-1 gap-2 align-center">
-                            <h2 className="text-xl font-semibold mt-2">Indication for study:</h2>
-                            {renderInputField('indication', '', 'text', 'Indication for Study')}
-                        </div>
-                        <Table className='border'>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="border p-2">Dimensions</TableHead>
-                                    <TableHead className="border p-2">Normal</TableHead>
-                                    <TableHead className="border p-2 w-[150px]">Patient Value</TableHead>
-                                    <TableHead className="border p-2"></TableHead>
-                                    <TableHead className="border p-2">Normal</TableHead>
-                                    <TableHead className="border p-2 w-[150px]">Patient Value</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                <TableRow>
-                                    <TableCell className="border p-1"> Aortic Root</TableCell>
-                                    <TableCell className="border p-1"> 20-40 mm</TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('aortic_root', '', 'number', 'Aortic Root')}</TableCell>
-                                    <TableCell className="border p-1"> IVSD(mm)</TableCell>
-                                    <TableCell className="border p-1"> 6 - 11</TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('ivsd', '', 'number', 'IVSD')}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="border p-1"> LA(AP)</TableCell>
-                                    <TableCell className="border p-1"> 20-40 mm</TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('la_ap', '', 'number', 'LA (AP)')}</TableCell>
-                                    <TableCell className="border p-1"> LVIDd(mm)</TableCell>
-                                    <TableCell className="border p-1"> 38 - 55</TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('lvidd', '', 'number', 'LVIDd')}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="border p-1"> MV Excursion</TableCell>
-                                    <TableCell className="border p-1"> </TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('mv_excursion', '', 'number', 'MV Excursion')}</TableCell>
-                                    <TableCell className="border p-1"> LVPWD(mm)</TableCell>
-                                    <TableCell className="border p-1"> 6 - 11</TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('lvpwd', '', 'number', 'LVIDd')}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="border p-1"> EF slope (mm/s)</TableCell>
-                                    <TableCell className="border p-1"> 50-180 </TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('ef_slope', '', 'number', 'EF slope')}</TableCell>
-                                    <TableCell className="border p-1"> IVSs</TableCell>
-                                    <TableCell className="border p-1"> </TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('ivss', '', 'number', 'IVSS')}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="border p-1"> EPSS(mm)</TableCell>
-                                    <TableCell className="border p-1"> &le; 10 </TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('epss', '', 'number', 'EPSS')}</TableCell>
-                                    <TableCell className="border p-1"> LVIDs</TableCell>
-                                    <TableCell className="border p-1"> </TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('lvids', '', 'number', 'LVIDs')}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="border p-1"> RVID(mm)</TableCell>
-                                    <TableCell className="border p-1"> 27 - 33</TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('rvid', '', 'number', 'RVID')}</TableCell>
-                                    <TableCell className="border p-1"> LVPWs</TableCell>
-                                    <TableCell className="border p-1"> </TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('lvpws', '', 'number', 'LVPWs')}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="border p-1"> RAA(cm<sup>2</sup>)</TableCell>
-                                    <TableCell className="border p-1"> 27 - 33</TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('raa', '', 'number', 'RAA')}</TableCell>
-                                    <TableCell className="border p-1"> FS(%)</TableCell>
-                                    <TableCell className="border p-1">25-45 </TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('fs', '', 'number', 'FS')}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="border p-1"> LAA(cm<sup>2</sup>)</TableCell>
-                                    <TableCell className="border p-1"> &le; 20</TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('laa', '', 'number', 'LAA')}</TableCell>
-                                    <TableCell className="border p-1"> EF(%)</TableCell>
-                                    <TableCell className="border p-1">&gt; 45 </TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('ef', '', 'number', 'EF')}</TableCell>
-                                </TableRow>
-                            </TableBody>
-                        </Table>
-                        <Table className='mt-1'>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="border p-2">Diastolic Function</TableHead>
-                                    <TableHead className="border p-2">Normal</TableHead>
-                                    <TableHead className="border p-2 w-[150px]">Patient Value</TableHead>
-                                    <TableHead className="border p-2"></TableHead>
-                                    <TableHead className="border p-2">Normal</TableHead>
-                                    <TableHead className="border p-2 w-[150px]">Patient Value</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                <TableRow>
-                                    <TableCell className="border p-1"> E Wave (m/s)</TableCell>
-                                    <TableCell className="border p-1"> </TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('e_wave', '', 'number', 'E Wave')}</TableCell>
-                                    <TableCell className="border p-1"> E' (lat)(m/s)</TableCell>
-                                    <TableCell className="border p-1"></TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('e_lat', '', 'number', '')}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="border p-1"> A Wave(m/s)</TableCell>
-                                    <TableCell className="border p-1"> </TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('a_wave', '', 'number', '')}</TableCell>
-                                    <TableCell className="border p-1"> A'(lat)(m/s)</TableCell>
-                                    <TableCell className="border p-1"> </TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('a_lat', '', 'number', '')}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="border p-1"> E/A</TableCell>
-                                    <TableCell className="border p-1"> </TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('e_a', '', 'number', '',{
-                                        onBlur: handleEACalc
-                                    })}</TableCell>
-                                    <TableCell className="border p-1"> S' (lat)(m/s)</TableCell>
-                                    <TableCell className="border p-1"> </TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('s_lat', '', 'number', '')}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="border p-1"> E wave DT(m/s)</TableCell>
-                                    <TableCell className="border p-1"> </TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('e_wave_dt', '', 'number', '')}</TableCell>
-                                    <TableCell className="border p-1"> E/E'</TableCell>
-                                    <TableCell className="border p-1"> &le;15</TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('e_e', '', 'number', '',{
-                                        onBlur: handleEECalc
-                                    })}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="border p-1"> IVRT(m/s)</TableCell>
-                                    <TableCell className="border p-1"> </TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('ivrt', '', 'number', '')}</TableCell>
-                                    <TableCell className="border p-1"> </TableCell>
-                                    <TableCell className="border p-1"> </TableCell>
-                                    <TableCell className="border p-1"> </TableCell>
-                                </TableRow>
-                            </TableBody>
-                        </Table>
-                        <Table className='mt-1'>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="border p-2">Doppler Measurements</TableHead>
-                                    <TableHead className="border p-2">Normal</TableHead>
-                                    <TableHead className="border p-2 w-[150px]">Patient Value</TableHead>
-                                    <TableHead className="border p-2"></TableHead>
-                                    <TableHead className="border p-2">Normal</TableHead>
-                                    <TableHead className="border p-2 w-[150px]">Patient Value</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                <TableRow>
-                                    <TableCell className="border p-1"> Aortic Valve(Peak vel)</TableCell>
-                                    <TableCell className="border p-1"> </TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('aortic_valve_peak', '', 'number', '')}</TableCell>
-                                    <TableCell className="border p-1"> Pulmonary valve (Peak vel)</TableCell>
-                                    <TableCell className="border p-1"> </TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('pulmonary_valve_peak', '', 'number', '')}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="border p-1"> Aortic valve (pressure gradient)</TableCell>
-                                    <TableCell className="border p-1"> </TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('aortic_valve_press', '', 'number', '')}</TableCell>
-                                    <TableCell className="border p-1"> Pulmonary valve (pressure gradient)</TableCell>
-                                    <TableCell className="border p-1"> </TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('pulmonary_valve_press', '', 'number', '')}</TableCell>
-                                </TableRow>
-                            </TableBody>
-                        </Table>
-
-
-                        <Table className='mt-1'>
-
-                            <TableBody>
-                                <TableRow>
-                                    <TableCell className="border p-1"> Aortic Valve(Peak vel)</TableCell>
-
-                                    <TableCell className="border p-1"> {renderInputField('aortic_valve_peak', '', 'number', '')}</TableCell>
-                                    <TableCell className="border p-1"> Pulmonary valve (Peak vel)</TableCell>
-
-                                    <TableCell className="border p-1"> {renderInputField('pulmonary_valve_peak', '', 'number', '')}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="border p-1"> Aortic valve (pressure gradient)</TableCell>
-
-                                    <TableCell className="border p-1"> {renderInputField('aortic_valve_press', '', 'number', '')}</TableCell>
-                                    <TableCell className="border p-1"> Pulmonary valve (pressure gradient)</TableCell>
-
-                                    <TableCell className="border p-1"> {renderInputField('pulmonary_valve_press', '', 'number', '')}</TableCell>
-                                </TableRow>
-                            </TableBody>
-                        </Table>
-                        <Table className='nt-1'>
-                            <TableBody>
-                                <TableRow>
-                                    <TableCell className="border p-1"> TRV<sub>max</sub></TableCell>
-                                    <TableCell className="border p-1">
-                                        {renderInputField('triscupid_regurg_peak', '', 'number')}
-                                    </TableCell>
-                                    <TableCell className="border p-1">
-                                        TR<sub>max</sub>PG
-                                    </TableCell>
-                                    <TableCell className="border p-1">
-                                        {renderInputField('triscupid_regurg_press', '', 'number', '', {
-                                            onBlur: handleRVSPCalc
-                                        })}
-                                    </TableCell>
-                                    <TableCell className="border p-1"> MRV <sub>max</sub></TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('mitral_regurg_peak', '', 'number', '')}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="border p-1"> MR<sub>max</sub>PG</TableCell>
-                                    <TableCell className="border p-1">
-                                        {renderInputField('mitral_regurg_press', '', 'number', '')}
-                                    </TableCell>
-                                    <TableCell className="border p-1">
-                                        ARV<sub>max</sub>
-                                    </TableCell>
-                                    <TableCell className="border p-1">
-                                        {renderInputField('aortic_regurg_peak', '', 'number', '')}
-                                    </TableCell>
-                                    <TableCell className="border p-1">
-                                        AR<sub>max</sub>PG
-                                    </TableCell>
-                                    <TableCell className="border p-1">
-                                        {renderInputField('aortic_regurg_press', '', 'number', '')}
-                                    </TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="border p-1">
-                                        Mitral Stenosis (valve Area)
-                                    </TableCell>
-                                    <TableCell className="border p-1">
-                                        {renderInputField('mitral_stenosis', '', 'number', '')}
-                                    </TableCell>
-                                    <TableCell className="border p-1">
-                                        IVC<sub>(ins)</sub>
-                                    </TableCell>
-                                    <TableCell className="border p-1">
-                                        {renderInputField('inferior_vena_cava_insp', '', 'number', '')}
-                                    </TableCell>
-                                    <TableCell className="border p-1">
-                                        IVC<sub>(ex)</sub>
-                                    </TableCell>
-                                    <TableCell className="border p-1">
-                                        {renderInputField('inferior_vena_cava_expi', '', 'number', '')}
-                                    </TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="border p-1">
-                                        IVC<sub>(diameter with valva manoeuvre)</sub>
-                                    </TableCell>
-                                    <TableCell className="border p-1">
-                                        {renderInputField('inferior_vena_cava_diam', '', 'number', '')}
-                                    </TableCell>
-                                    <TableCell className="border p-1">
-                                        Est. Right Aterial pressure
-                                    </TableCell>
-                                    <TableCell className="border p-1">
-                                        {renderInputField('est_right', '', 'number', '', {
-                                            onBlur: handlePASPCalc
-                                        })}
-                                    </TableCell>
-                                    <TableCell className="border p-1">
-                                        PASP
-                                    </TableCell>
-                                    <TableCell className="border p-1">
-                                        {renderInputField('pasp', '', 'number', '')}
-                                    </TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="border p-1">
-                                        MPAP
-                                    </TableCell>
-                                    <TableCell className="border p-1">
-                                        {renderInputField('mpap', '', 'number', '')}
-                                    </TableCell>
-                                    <TableCell className="border p-1">
-                                        RVSP
-                                    </TableCell>
-                                    <TableCell className="border p-1">
-                                        {renderInputField('mvsp', '', 'number', '')}
-                                    </TableCell>
-                                    <TableCell className="border p-1"> </TableCell>
-                                    <TableCell className="border p-1"> </TableCell>
-                                </TableRow>
-                            </TableBody>
-                        </Table>
-                        <div>
-                            <h2 className="mb-4 text-xl font-semibold">Final Report</h2>
-                            <div className="grid grid-cols-1 gap-6">
-                                <div className="grid gap-2">
-                                    <Select
-                                        value={data.pericardium}
-                                        onValueChange={(value) => setData('pericardium', value)}
-                                    >
-                                        <SelectTrigger className="w-[250px]">
-                                            <SelectValue placeholder="Pericardium" />
-                                        </SelectTrigger>
-
-                                        <SelectContent>
-                                            <SelectItem value="Normal">Normal</SelectItem>
-                                            <SelectItem value="Abnormal">Abnormal</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <InputError message={errors.gender} className="mt-2" />
+                                                            <SelectContent>
+                                                                <SelectItem value="male">Male</SelectItem>
+                                                                <SelectItem value="female">Female</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                        <InputError message={errors.gender} className="mt-2" />
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="border p-2"> {renderInputField('date_of_birth', '', 'date')}</TableCell>
+                                                <TableCell className="border p-2">{renderInputField('nicl', '')}</TableCell>
+                                            </TableRow>
+                                        </TableBody>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead className="border p-2">TEST DATE</TableHead>
+                                                <TableHead className="border p-2">WEIGHT(kg)</TableHead>
+                                                <TableHead className="border p-2">WC(cm)</TableHead>
+                                                <TableHead className="w-[100px] border p-2">HEIGHT(cm)</TableHead>
+                                                <TableHead className="border p-2">
+                                                    BSA(m<sup>2</sup>)
+                                                </TableHead>
+                                                <TableHead className="border p-2">BP(mmHg)</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            <TableRow>
+                                                <TableCell className="border p-2">{renderInputField('test_date', '', 'date')}</TableCell>
+                                                <TableCell className="border p-2">
+                                                    {' '}
+                                                    {renderInputField('weight', '', 'number', 'Weight(kg)', {
+                                                        onBlur: handleBSACalc,
+                                                    })}
+                                                </TableCell>
+                                                <TableCell className="border p-2"> {renderInputField('wc_cm', '')}</TableCell>
+                                                <TableCell className="border p-2">
+                                                    {' '}
+                                                    {renderInputField('height', '', 'number', 'Height(cm)', {
+                                                        onBlur: handleBSACalc,
+                                                    })}
+                                                </TableCell>
+                                                <TableCell className="border p-2"> {renderInputField('bsa', '')}</TableCell>
+                                                <TableCell className="border p-2">{renderInputField('blood_pressure', '')}</TableCell>
+                                            </TableRow>
+                                        </TableBody>
+                                    </Table>
                                 </div>
-                                {renderTextareaField('summary', 'Summary', 'Optional')}
-                                {renderTextareaField('conclusion', 'Conclusion', 'Optional')}
 
-                            </div>
-                            <div className="mt-3">
-                                <Label>Signed:</Label>
-                                <Select value='{data.sign}'
-                                    onValueChange={(value) => setData('sign', value)}
-                                >
-                                    <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Signed" />
-                                    </SelectTrigger>
+                                <div className="grid grid-cols-1 items-center justify-items-end rounded border pb-1 md:grid-cols-3">
+                                    <h2 className="mt-2 text-xl font-semibold">Indication for study:</h2>
+                                    <div className="w-full md:col-span-2">{renderInputField('indication', '', 'text', 'Indication for Study')}</div>
+                                </div>
+                            </TabsContent>
 
-                                    <SelectContent>
-                                        <SelectItem value="Dr. SALAU (FWACP)">Dr. SALAU (FWACP)</SelectItem>
-                                        <SelectItem value="DR. ABIODUN (FWACP)">DR. ABIODUN (FWACP)</SelectItem>
-                                        <SelectItem value="DR. BELLO (FWACP)">DR. BELLO (FWACP)</SelectItem>
-                                        <SelectItem value="DR. SAMBO (FWACP)">DR. SAMBO (FWACP)</SelectItem>
-                                        <SelectItem value="DR. MOHAMMED, DR. SALAU (FWACP)">DR. MOHAMMED,DR. SALAU (FWACP)</SelectItem>
-                                        <SelectItem value="DR. MOHAMMED, DR. ABIODUN (FWACP)">DR. MOHAMMED,DR. ABIODUN (FWACP)</SelectItem>
-                                        <SelectItem value="DR. MOHAMMED, DR. BELLO (FWACP)">DR. MOHAMMED,DR. BELLO (FWACP)</SelectItem>
-                                        <SelectItem value="DR. MOHAMMED, DR. SAMBO (FWACP)">DR. MOHAMMED,DR. SAMBO (FWACP)</SelectItem>
-                                        <SelectItem value="DR. BASSEY, DR. SALAU (FWACP)">DR. BASSEY,DR. SALAU (FWACP)</SelectItem>
-                                        <SelectItem value="DR. BASSEY, DR. ABIODUN (FWACP)">DR. BASSEY,DR. ABIODUN (FWACP)</SelectItem>
-                                        <SelectItem value="DR. BASSEY, DR. BELLO (FWACP)">DR. BASSEY,DR. BELLO (FWACP)</SelectItem>
-                                        <SelectItem value="DR. BASSEY, DR. SAMBO (FWACP)">DR. BASSEY,DR. SAMBO (FWACP)</SelectItem>
-                                        <SelectItem value="DR. OBODO, DR. SALAU (FWACP)">DR. OBODO ,DR. SALAU (FWACP)</SelectItem>
-                                        <SelectItem value="DR. OBODO, DR. ABIODUN (FWACP)">DR. OBODO ,DR. ABIODUN (FWACP)</SelectItem>
-                                        <SelectItem value="DR. OBODO, DR. BELLO (FWACP)">DR. OBODO ,DR. BELLO (FWACP)</SelectItem>
-                                        <SelectItem value="DR. OBODO, DR. SAMBO (FWACP)">DR. OBODO ,DR. SAMBO (FWACP)</SelectItem>
-                                    </SelectContent>
+                            {/* Dimensions Tab */}
+                            <TabsContent value="dimensions" className="space-y-4">
+                                <Table className="border">
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead className="border p-2">Dimensions</TableHead>
+                                            <TableHead className="w-[150px] border p-2">Patient Value</TableHead>
+                                            <TableHead className="border p-2"></TableHead>
+                                            <TableHead className="w-[150px] border p-2">Patient Value</TableHead>
+                                            <TableHead className="border p-2"></TableHead>
+                                            <TableHead className="w-[150px] border p-2">Patient Value</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        <TableRow>
+                                            <TableCell className="border p-1"> Aortic Root</TableCell>
+                                            <TableCell className="border p-1">
+                                                {' '}
+                                                {renderInputField('aortic_root', '', 'number', 'Aortic Root')}
+                                            </TableCell>
+                                            <TableCell className="border p-1"> IVSD(mm)</TableCell>
+                                            <TableCell className="border p-1"> {renderInputField('ivsd', '', 'number', 'IVSD')}</TableCell>
+                                            <TableCell className="border p-1"> LA(AP)</TableCell>
+                                            <TableCell className="border p-1"> {renderInputField('la_ap', '', 'number', 'LA (AP)')}</TableCell>
+                                        </TableRow>
+                                        <TableRow>
+                                            <TableCell className="border p-1"> LVIDd(mm)</TableCell>
+                                            <TableCell className="border p-1"> {renderInputField('lvidd', '', 'number', 'LVIDd')}</TableCell>
+                                            <TableCell className="border p-1"> MV Excursion</TableCell>
+                                            <TableCell className="border p-1">
+                                                {' '}
+                                                {renderInputField('mv_excursion', '', 'number', 'MV Excursion')}
+                                            </TableCell>
+                                            <TableCell className="border p-1"> LVPWD(mm)</TableCell>
+                                            <TableCell className="border p-1"> {renderInputField('lvpwd', '', 'number', 'LVPWD')}</TableCell>
+                                        </TableRow>
+                                        <TableRow>
+                                            <TableCell className="border p-1"> EF slope (mm/s)</TableCell>
+                                            <TableCell className="border p-1"> {renderInputField('ef_slope', '', 'number', 'EF slope')}</TableCell>
+                                            <TableCell className="border p-1"> IVSs</TableCell>
+                                            <TableCell className="border p-1"> {renderInputField('ivss', '', 'number', 'IVSS')}</TableCell>
+                                        </TableRow>
+                                        <TableRow>
+                                            <TableCell className="border p-1"> EPSS(mm)</TableCell>
+                                            <TableCell className="border p-1"> {renderInputField('epss', '', 'number', 'EPSS')}</TableCell>
+                                            <TableCell className="border p-1"> LVIDs</TableCell>
+                                            <TableCell className="border p-1"> {renderInputField('lvids', '', 'number', 'LVIDs')}</TableCell>
+                                            <TableCell className="border p-1"> RVID(mm)</TableCell>
+                                            <TableCell className="border p-1"> {renderInputField('rvid', '', 'number', 'RVID')}</TableCell>
+                                        </TableRow>
+                                        <TableRow>
+                                            <TableCell className="border p-1"> LVPWs</TableCell>
+                                            <TableCell className="border p-1"> {renderInputField('lvpws', '', 'number', 'LVPWs')}</TableCell>
+                                            <TableCell className="border p-1">
+                                                {' '}
+                                                RAA(cm<sup>2</sup>)
+                                            </TableCell>
+                                            <TableCell className="border p-1"> {renderInputField('raa', '', 'number', 'RAA')}</TableCell>
+                                            <TableCell className="border p-1"> FS(%)</TableCell>
+                                            <TableCell className="border p-1"> {renderInputField('fs', '', 'number', 'FS')}</TableCell>
+                                        </TableRow>
 
-                                </Select>
-                            </div>
-                        </div>
-                        <div className="flex justify-end space-x-2">
-                            <Button type="button" variant="outline" onClick={() => window.history.back()}>
-                                Cancel
-                            </Button>
-                            <Button type="submit" disabled={processing}>
-                                Update Test Record
-                            </Button>
-                        </div>
+                                        <TableRow>
+                                            <TableCell className="border p-1">
+                                                {' '}
+                                                LAA(cm<sup>2</sup>)
+                                            </TableCell>
+                                            <TableCell className="border p-1"> {renderInputField('laa', '', 'number', 'LAA')}</TableCell>
+                                            <TableCell className="border p-1"> EF(%)</TableCell>
+                                            <TableCell className="border p-1"> {renderInputField('ef', '', 'number', 'EF')}</TableCell>
+                                        </TableRow>
+                                    </TableBody>
+                                </Table>
+                            </TabsContent>
+
+                            {/* Diastolic Function Tab */}
+                            <TabsContent value="diastolic-function" className="space-y-4">
+                                <Table className="mt-1">
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead className="border p-2">Diastolic Function</TableHead>
+                                            <TableHead className="w-[150px] border p-2">Patient Value</TableHead>
+                                            <TableHead className="border p-2"></TableHead>
+                                            <TableHead className="w-[150px] border p-2">Patient Value</TableHead>
+                                            <TableHead className="border p-2"></TableHead>
+                                            <TableHead className="w-[150px] border p-2">Patient Value</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        <TableRow>
+                                            <TableCell className="border p-1"> E Wave (m/s)</TableCell>
+                                            <TableCell className="border p-1">
+                                                {' '}
+                                                {renderInputField('e_wave', '', 'number', 'E Wave', {
+                                                    onBlur: handleEACalc,
+                                                })}
+                                            </TableCell>
+                                            <TableCell className="border p-1"> E' (lat)(m/s)</TableCell>
+                                            <TableCell className="border p-1">
+                                                {' '}
+                                                {renderInputField('e_lat', '', 'number', '', {
+                                                    onBlur: handleEECalc,
+                                                })}
+                                            </TableCell>
+                                            <TableCell className="border p-1"> A Wave(m/s)</TableCell>
+                                            <TableCell className="border p-1">
+                                                {' '}
+                                                {renderInputField('a_wave', '', 'number', 'A Wave', {
+                                                    onBlur: handleEACalc,
+                                                })}
+                                            </TableCell>
+                                        </TableRow>
+                                        <TableRow>
+                                            <TableCell className="border p-1"> A'(lat)(m/s)</TableCell>
+                                            <TableCell className="border p-1"> {renderInputField('a_lat', '', 'number', '')}</TableCell>
+                                            <TableCell className="border p-1"> E/A</TableCell>
+                                            <TableCell className="border p-1"> {renderInputField('e_a', '', 'number', '')}</TableCell>
+                                            <TableCell className="border p-1"> S' (lat)(m/s)</TableCell>
+                                            <TableCell className="border p-1"> {renderInputField('s_lat', '', 'number', '')}</TableCell>
+                                        </TableRow>
+
+                                        <TableRow>
+                                            <TableCell className="border p-1"> E wave DT(m/s)</TableCell>
+                                            <TableCell className="border p-1"> {renderInputField('e_wave_dt', '', 'number', '')}</TableCell>
+                                            <TableCell className="border p-1"> E/E'</TableCell>
+                                            <TableCell className="border p-1"> {renderInputField('e_e', '', 'number', '')}</TableCell>
+                                            <TableCell className="border p-1"> IVRT(m/s)</TableCell>
+                                            <TableCell className="border p-1"> {renderInputField('ivrt', '', 'number', '')}</TableCell>
+                                        </TableRow>
+                                    </TableBody>
+                                </Table>
+
+                                <Table className="mt-1">
+                                    <TableBody>
+                                        <TableRow>
+                                            <TableCell className="border p-1"> Aortic Valve(Peak vel)</TableCell>
+                                            <TableCell className="border p-1">
+                                                {' '}
+                                                <div className="flex items-center justify-between">
+                                                    {renderInputField('aortic_valve_peak', '', 'number', '')} m/s
+                                                </div>{' '}
+                                            </TableCell>
+                                            <TableCell className="border p-1"> Pulmonary valve (Peak vel)</TableCell>
+                                            <TableCell className="border p-1">
+                                                <div className="flex items-center justify-between">
+                                                    {renderInputField('pulmonary_valve_peak', '', 'number', '')} m/s
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                        <TableRow>
+                                            <TableCell className="border p-1"> Aortic valve (pressure gradient)</TableCell>
+                                            <TableCell className="border p-1">
+                                                <div className="flex items-center justify-between">
+                                                    {' '}
+                                                    {renderInputField('aortic_valve_press', '', 'number', '')} mmHg{' '}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="border p-1"> Pulmonary valve (pressure gradient)</TableCell>
+                                            <TableCell className="border p-1">
+                                                {' '}
+                                                <div className="flex items-center justify-between">
+                                                    {renderInputField('pulmonary_valve_press', '', 'number', '')} mmHg{' '}
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableBody>
+                                </Table>
+                            </TabsContent>
+
+                            {/* Report Tab */}
+                            <TabsContent value="report" className="space-y-4">
+                                <div>
+                                    <Table className="mt-1">
+                                        <TableBody>
+                                            <TableRow>
+                                                <TableCell className="border p-1">
+                                                    {' '}
+                                                    TRV<sub>max</sub>
+                                                </TableCell>
+                                                <TableCell className="border p-1">
+                                                    {renderInputField('triscupid_regurg_peak', '', 'number')}
+                                                </TableCell>
+                                                <TableCell className="border p-1">
+                                                    TR<sub>max</sub>PG
+                                                </TableCell>
+                                                <TableCell className="border p-1">
+                                                    {renderInputField('triscupid_regurg_press', '', 'number', '', {
+                                                        onBlur: handleRVSPCalc,
+                                                    })}
+                                                </TableCell>
+                                                <TableCell className="border p-1">
+                                                    {' '}
+                                                    MRV <sub>max</sub>
+                                                </TableCell>
+                                                <TableCell className="border p-1">
+                                                    {' '}
+                                                    {renderInputField('mitral_regurg_peak', '', 'number', '')}
+                                                </TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell className="border p-1">
+                                                    {' '}
+                                                    MR<sub>max</sub>PG
+                                                </TableCell>
+                                                <TableCell className="border p-1">
+                                                    {renderInputField('mitral_regurg_press', '', 'number', '')}
+                                                </TableCell>
+                                                <TableCell className="border p-1">
+                                                    ARV<sub>max</sub>
+                                                </TableCell>
+                                                <TableCell className="border p-1">
+                                                    {renderInputField('aortic_regurg_peak', '', 'number', '')}
+                                                </TableCell>
+                                                <TableCell className="border p-1">
+                                                    AR<sub>max</sub>PG
+                                                </TableCell>
+                                                <TableCell className="border p-1">
+                                                    {renderInputField('aortic_regurg_press', '', 'number', '')}
+                                                </TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell className="border p-1">Mitral Stenosis (valve Area)</TableCell>
+                                                <TableCell className="border p-1">{renderInputField('mitral_stenosis', '', 'number', '')}</TableCell>
+                                                <TableCell className="border p-1">
+                                                    IVC<sub>(ins)</sub>
+                                                </TableCell>
+                                                <TableCell className="border p-1">
+                                                    {renderInputField('inferior_vena_cava_insp', '', 'number', '')}
+                                                </TableCell>
+                                                <TableCell className="border p-1">
+                                                    IVC<sub>(ex)</sub>
+                                                </TableCell>
+                                                <TableCell className="border p-1">
+                                                    {renderInputField('inferior_vena_cava_expi', '', 'number', '')}
+                                                </TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell className="border p-1">
+                                                    IVC<sub>(diameter with valva manoeuvre)</sub>
+                                                </TableCell>
+                                                <TableCell className="border p-1">
+                                                    {renderInputField('inferior_vena_cava_diam', '', 'number', '')}
+                                                </TableCell>
+                                                <TableCell className="border p-1">Est. Right Aterial pressure</TableCell>
+                                                <TableCell className="border p-1">
+                                                    {renderInputField('est_right', '', 'number', '', {
+                                                        onBlur: handlePASPCalc,
+                                                    })}
+                                                </TableCell>
+                                                <TableCell className="border p-1">PASP</TableCell>
+                                                <TableCell className="border p-1">{renderInputField('pasp', '', 'number', '')}</TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell className="border p-1">MPAP</TableCell>
+                                                <TableCell className="border p-1">{renderInputField('mpap', '', 'number', '')}</TableCell>
+                                                <TableCell className="border p-1">RVSP</TableCell>
+                                                <TableCell className="border p-1">{renderInputField('mvsp', '', 'number', '')}</TableCell>
+                                                <TableCell className="border p-1"> </TableCell>
+                                                <TableCell className="border p-1"> </TableCell>
+                                            </TableRow>
+                                        </TableBody>
+                                    </Table>
+                                    <h2 className="mb-4 text-xl font-semibold">Final Report</h2>
+                                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                                        <div className="grid gap-2">
+                                            <Label>Pericardium</Label>
+                                            <Select value={data.pericardium} onValueChange={(value) => setData('pericardium', value)}>
+                                                <SelectTrigger className="w-[250px]">
+                                                    <SelectValue placeholder="Pericardium" />
+                                                </SelectTrigger>
+
+                                                <SelectContent>
+                                                    <SelectItem value="Normal">Normal</SelectItem>
+                                                    <SelectItem value="Abnormal">Abnormal</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <InputError message={errors.gender} className="mt-2" />
+                                        </div>
+                                        {renderTextareaField('summary', 'Summary', 'Optional')}
+                                        {renderTextareaField('conclusion', 'Conclusion', 'Optional')}
+                                    </div>
+                                    <div className="mt-3">
+                                        <Label>Signed:</Label>
+                                        <Select value={data.sign} onValueChange={(value) => setData('sign', value)}>
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder="Signed" />
+                                            </SelectTrigger>
+
+                                            <SelectContent>
+                                                <SelectItem value="Dr. SALAU (FWACP)">Dr. SALAU (FWACP)</SelectItem>
+                                                <SelectItem value="DR. ABIODUN (FWACP)">DR. ABIODUN (FWACP)</SelectItem>
+                                                <SelectItem value="DR. BELLO (FWACP)">DR. BELLO (FWACP)</SelectItem>
+                                                <SelectItem value="DR. SAMBO (FWACP)">DR. SAMBO (FWACP)</SelectItem>
+                                                <SelectItem value="DR. SALAU (FWACP), DR. MOHAMMED"> DR. SALAU (FWACP), DR. MOHAMMED</SelectItem>
+                                                <SelectItem value="DR. ABIODUN (FWACP), DR. MOHAMMED"> DR. ABIODUN (FWACP), DR. MOHAMMED</SelectItem>
+                                                <SelectItem value="DR. BELLO (FWACP), DR. MOHAMMED"> DR. BELLO (FWACP), DR. MOHAMMED</SelectItem>
+                                                <SelectItem value=" DR. SAMBO (FWACP), DR. MOHAMMED">DR. SAMBO (FWACP), DR. MOHAMMED</SelectItem>
+                                                <SelectItem value="DR. SALAU (FWACP), DR. BASSEY">, DR. SALAU (FWACP), DR. BASSEY</SelectItem>
+                                                <SelectItem value="DR. ABIODUN (FWACP), DR. BASSEY"> DR. ABIODUN (FWACP), DR. BASSEY</SelectItem>
+                                                <SelectItem value=" DR. BELLO (FWACP), DR. BASSEY"> DR. BELLO (FWACP), DR. BASSEY</SelectItem>
+                                                <SelectItem value="DR. SAMBO (FWACP), DR. BASSEY,">DR. SAMBO (FWACP), DR. BASSEY</SelectItem>
+                                                <SelectItem value="DR. SALAU (FWACP), DR. OBODO">DR. SALAU (FWACP), DR. OBODO</SelectItem>
+                                                <SelectItem value=" DR. ABIODUN (FWACP), DR. OBODO"> DR. ABIODUN (FWACP), DR. OBODO</SelectItem>
+                                                <SelectItem value="DR. BELLO (FWACP), DR. OBODO">DR. BELLO (FWACP), DR. OBODO </SelectItem>
+                                                <SelectItem value=" DR. SAMBO (FWACP), DR. OBODO">DR. SAMBO (FWACP), DR. OBODO</SelectItem>
+                                                <SelectItem value="others">Others</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <InputError message={errors.sign} className="mt-2" />
+                                    </div>
+                                    <div className={`mt-3 ${data.sign !== 'others' ? 'hidden' : ''}`}>
+                                        <Label>Doctor Name</Label>
+                                        <Input
+                                            type="text"
+                                            value={data.doctor_name}
+                                            onChange={(e) => setData('doctor_name', e.target.value)}
+                                            className="w-full"
+                                            placeholder="Report Type"
+                                        />
+                                        <InputError message={errors.sign} className="mt-2" />
+                                    </div>
+                                </div>
+                                <Button type="submit" disabled={processing} className="mt-4">
+                                    Update Test Record
+                                </Button>
+                            </TabsContent>
+                        </Tabs>
                     </form>
                 </div>
             </div>

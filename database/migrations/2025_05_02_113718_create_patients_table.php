@@ -18,7 +18,9 @@ return new class extends Migration
             $table->string('gender');
             $table->string('hospital_id');
             $table->date('date_of_birth');
-            $table->string('nicl');
+            $table->string('phone_number')->nullable();
+
+            $table->string('nicl')->nullable();
             $table->timestamps();
         });
     }

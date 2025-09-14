@@ -37,6 +37,16 @@ export default function Login({ status }: LoginProps) {
     return (
         <AuthLayout title="Log in to your account" description="Enter your username and password below to log in">
             <Head title="Log in" />
+            {/*show all validation errors */}
+            {Object.keys(errors).length > 0 && (
+                <div className="mb-4 rounded-lg bg-red-100 p-4 text-red-700">
+                    <ul className="list-disc space-y-1 pl-5">
+                        {Object.values(errors).map((error, index) => (
+                            <li key={index}>{error}</li>
+                        ))}
+                    </ul>
+                </div>
+            )}
 
             <form className="flex flex-col gap-6" onSubmit={submit}>
                 <div className="grid gap-6">
@@ -59,7 +69,6 @@ export default function Login({ status }: LoginProps) {
                     <div className="grid gap-2">
                         <div className="flex items-center">
                             <Label htmlFor="password">Password</Label>
-
                         </div>
                         <Input
                             id="password"
@@ -90,8 +99,6 @@ export default function Login({ status }: LoginProps) {
                         Log in
                     </Button>
                 </div>
-
-
             </form>
 
             {status && <div className="mb-4 text-center text-sm font-medium text-green-600">{status}</div>}

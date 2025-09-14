@@ -24,6 +24,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/deleteTest/{testRecord}/tests', [\App\Http\Controllers\PatientController::class,'deleteTestRecord'])->name('patients.deleteTest');
 
     });
+    Route::group(['prefix'=>'kids'],function(){
+        Route::get('/', [\App\Http\Controllers\PaedController::class,'index'])->name('kids.index');
+        Route::get('create', [\App\Http\Controllers\PaedController::class,'creteTest'])->name('kids.create');
+        Route::post('store', [\App\Http\Controllers\PaedController::class,'store'])->name('kids.store');
+        Route::get('{childReading}', [\App\Http\Controllers\PaedController::class,'showTest'])->name('kids.show');
+        Route::get('{childReading}/edit', [\App\Http\Controllers\PaedController::class,'editTest'])->name('kids.edit');
+        Route::put('{childReading}', [\App\Http\Controllers\PaedController::class,'updateTest'])->name('kids.update');
+        Route::delete('{childReading}', [\App\Http\Controllers\PaedController::class,'destroyTest'])->name('kids.destroy');
+    });
 });
 
 require __DIR__.'/settings.php';

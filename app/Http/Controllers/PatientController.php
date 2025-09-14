@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ChildReading;
 use App\Models\Patient;
 use App\Models\TestRecord;
 use Illuminate\Container\Attributes\Auth;
@@ -40,8 +41,11 @@ class PatientController extends Controller
             })
             ->orderBy('created_at', 'desc');
         if(request()->has('search')){
-
+            $query->orWhereHas('patient', function ($query) use ($search) {
+                $query->where('hospital_id', 'like', "%{$search}%");
+            });
         }
+
         $tests = $query->paginate(10);
         return Inertia::render('patients/index', [
             'tests' => $tests,
@@ -72,71 +76,71 @@ class PatientController extends Controller
         //  dd(auth()->id());
         // Assuming user_id will be set automatically, e.g., auth()->id()
         $validated = $request->validate([
-            'hospital_id' => 'required|string|max:255',
-            'surname' => 'required|string|max:255',
-            'other_names' => 'required|string|max:255',
+            'hospital_id' => 'required|string',
+            'surname' => 'required|string',
+            'other_names' => 'required|string',
             'date_of_birth' => 'required|date',
-            'gender' => 'required|string|max:255', // Assuming gender is a string
-            'nicl' => 'required|string|max:255', // Assuming nicl is a string
+            'gender' => 'required|string', // Assuming gender is a string
+            'nicl' => 'required|string', // Assuming nicl is a string
             'test_date' => 'required|date',
-            'weight' => 'required|numeric|max:255', // Consider 'numeric' if applicable
-            'height' => 'required|numeric|max:255', // Consider 'numeric' if applicable
-            'bsa' => 'required|numeric|max:255', // Consider 'numeric' if applicable
-            'blood_pressure' => 'nullable|numeric|max:255',
-            'wc_cm' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'indication' => 'required|string|max:255',
+            'weight' => 'required|numeric', // Consider 'numeric' if applicable
+            'height' => 'required|numeric', // Consider 'numeric' if applicable
+            'bsa' => 'required|numeric', // Consider 'numeric' if applicable
+            'blood_pressure' => 'nullable|numeric',
+            'wc_cm' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'indication' => 'required|string',
             // Dimension
-            'aortic_root' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'la_ap' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'mv_excursion' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'ef_slope' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'epss' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'rvid' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'raa' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'laa' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'ivsd' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'lvidd' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'lvpwd' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'ivss' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'lvids' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'lvpws' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'fs' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'ef' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
+            'aortic_root' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'la_ap' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'mv_excursion' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'ef_slope' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'epss' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'rvid' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'raa' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'laa' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'ivsd' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'lvidd' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'lvpwd' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'ivss' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'lvids' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'lvpws' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'fs' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'ef' => 'nullable|numeric', // Consider 'numeric' if applicable
             // Diastolic function
-            'e_wave' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'a_wave' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'e_a' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'e_wave_dt' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'e_lat' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'a_lat' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            's_lat' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'e_e' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'ivrt' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
+            'e_wave' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'a_wave' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'e_a' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'e_wave_dt' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'e_lat' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'a_lat' => 'nullable|numeric', // Consider 'numeric' if applicable
+            's_lat' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'e_e' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'ivrt' => 'nullable|numeric', // Consider 'numeric' if applicable
             // Doppler measurements
-            'aortic_valve_peak' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'aortic_valve_press' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'pulmonary_valve_press' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'pulmonary_valve_peak' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'triscupid_regurg_peak' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'triscupid_regurg_press' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'mitral_regurg_peak' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'mitral_regurg_press' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'aortic_regurg_peak' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'aortic_regurg_press' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'mitral_stenosis' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'inferior_vena_cava_insp' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'inferior_vena_cava_expi' => 'nullable|numeric|max:255', // Consider 'numeric' if applicable
-            'inferior_vena_cava_diam' => 'nullable|numeric|max:255',
+            'aortic_valve_peak' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'aortic_valve_press' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'pulmonary_valve_press' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'pulmonary_valve_peak' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'triscupid_regurg_peak' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'triscupid_regurg_press' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'mitral_regurg_peak' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'mitral_regurg_press' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'aortic_regurg_peak' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'aortic_regurg_press' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'mitral_stenosis' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'inferior_vena_cava_insp' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'inferior_vena_cava_expi' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'inferior_vena_cava_diam' => 'nullable|numeric',
             // Consider 'numeric' if applicable
             'pasp' => 'nullable|numeric',
             'mpap'  => 'nullable|numeric',
             'mvsp' => 'nullable|numeric',
-            'est_right' => 'nullable|numeric|max:255',
-            'pericardium' => 'nullable|string|max:255',
+            'est_right' => 'nullable|numeric',
+            'pericardium' => 'nullable|string',
             'summary' => 'nullable|string', // Text fields might not need max length
             'conclusion' => 'nullable|string', // Text fields might not need max length
-            'sign' => 'nullable|string|max:255',
-            'doctor_name' => 'nullable|string|max:255', // Optional field for doctor's name
+            'sign' => 'nullable|string',
+            'doctor_name' => 'nullable|string', // Optional field for doctor's name
         ]);
         $patient = Patient::firstOrCreate([
             'hospital_id' => $validated['hospital_id']],[
@@ -146,9 +150,10 @@ class PatientController extends Controller
             'gender' => $validated['gender'],
             'nicl' => $validated['nicl'],
         ]);
+        // dd($patient->id);
         $testRecord = TestRecord::create([
             'patient_id' => $patient->id,
-            'user_id' => auth()->id(),
+
             'test_date' => $validated['test_date'],
             'weight' => $validated['weight'],
             'height' => $validated['height'],
@@ -204,6 +209,7 @@ class PatientController extends Controller
             'pericardium' => $validated['pericardium'],
             'summary' => $validated['summary'],
             'conclusion' => $validated['conclusion'],
+            'user_id' => auth()->id(),
             'sign' => $validated['sign'] === 'others' ? $validated['doctor_name'] : $validated['sign'],
         ]);
 
@@ -221,6 +227,7 @@ class PatientController extends Controller
         return Inertia::render('patients/show', [
             'patient' => $patient,
             'tests' => $patient->testRecords,
+            'kidsTests' => $patient->childReadings,
         ]);
     }
 
@@ -255,9 +262,9 @@ class PatientController extends Controller
             'weight' => 'required|numeric',
             'height' => 'required|numeric',
             'bsa' => 'required|numeric',
-            'blood_pressure' => 'nullable|string|max:255',
+            'blood_pressure' => 'nullable|string',
             'wc_cm' => 'nullable|numeric',
-            'indication' => 'required|string|max:255',
+            'indication' => 'required|string',
             // Dimension
             'aortic_root' => 'nullable|numeric',
             'la_ap' => 'nullable|numeric',
@@ -290,25 +297,25 @@ class PatientController extends Controller
             'aortic_valve_press' => 'nullable|numeric',
             'pulmonary_valve_press' => 'nullable|numeric',
             'pulmonary_valve_peak' => 'nullable|numeric',
-            'triscupid_regurg_peak' => 'nullable|string|max:255',
-            'triscupid_regurg_press' => 'nullable|string|max:255',
-            'mitral_regurg_peak' => 'nullable|string|max:255',
-            'mitral_regurg_press' => 'nullable|string|max:255',
-            'aortic_regurg_peak' => 'nullable|string|max:255',
-            'aortic_regurg_press' => 'nullable|string|max:255',
-            'mitral_stenosis' => 'nullable|string|max:255',
-            'inferior_vena_cava_insp' => 'nullable|string|max:255',
-            'inferior_vena_cava_expi' => 'nullable|string|max:255',
-            'inferior_vena_cava_diam' => 'nullable|string|max:255',
+            'triscupid_regurg_peak' => 'nullable|string',
+            'triscupid_regurg_press' => 'nullable|string',
+            'mitral_regurg_peak' => 'nullable|string',
+            'mitral_regurg_press' => 'nullable|string',
+            'aortic_regurg_peak' => 'nullable|string',
+            'aortic_regurg_press' => 'nullable|string',
+            'mitral_stenosis' => 'nullable|string',
+            'inferior_vena_cava_insp' => 'nullable|string',
+            'inferior_vena_cava_expi' => 'nullable|string',
+            'inferior_vena_cava_diam' => 'nullable|string',
             'pasp' => 'nullable|numeric',
             'mpap'  => 'nullable|numeric',
             'mvsp' => 'nullable|numeric',
-            'est_right' => 'nullable|string|max:255',
-            'pericardium' => 'nullable|string|max:255',
+            'est_right' => 'nullable|string',
+            'pericardium' => 'nullable|string',
             'summary' => 'nullable|string',
             'conclusion' => 'nullable|string',
-            'sign' => 'nullable|string|max:255',
-            'doctor_name' => 'nullable|string|max:255', // Optional field for doctor's name
+            'sign' => 'nullable|string',
+            'doctor_name' => 'nullable|string', // Optional field for doctor's name
         ]);
         // Update the test record with the validated data
         $validated['sign'] = $validated['sign'] === 'others' ? $validated['doctor_name'] : $validated['sign'];

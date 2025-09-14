@@ -16,4 +16,8 @@ class Patient extends Model
     {
         return $this->hasMany(TestRecord::class);
     }
+   public function childReadings(): HasMany
+   {
+       return $this->hasMany(ChildReading::class);
+   }
 }

@@ -51,6 +51,7 @@ interface Patient {
     gender: string;
     date_of_birth: string;
     test_records_count: number;
+    child_readings_count: number;
 }
 
 interface PaginationLink {
@@ -70,6 +71,8 @@ interface PaginationData {
 interface DashboardProps {
     yearlyTestCount: number;
     monthlyTestCount: number;
+    yearKidsTestCount: number;
+    monthlyKidsTestCount: number;
     genderData: {
         male: number;
         female: number;
@@ -83,6 +86,8 @@ interface DashboardProps {
 export default function Dashboard({
     yearlyTestCount,
     monthlyTestCount,
+    yearKidsTestCount,
+    monthlyKidsTestCount,
     genderData,
     patients,
     filters
@@ -174,6 +179,33 @@ export default function Dashboard({
                             </div>
                         </CardContent>
                     </Card>
+                    {/* Card 4: Monthly Kids Test Count */}
+                    <Card className="shadow-md">
+                        <CardHeader className="pb-2">
+                            <CardTitle className="text-lg">Kids Tests This Month</CardTitle>
+                            <CardDescription>Kids Tests conducted in {new Date().toLocaleString('default', { month: 'long' })}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex items-center justify-between">
+                                <div className="text-3xl font-bold">{monthlyKidsTestCount}</div>
+                                <Calendar className="h-8 w-8 text-green-500" />
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Card 5: Yearly Kids Test Count */}
+                    <Card className="shadow-md">
+                        <CardHeader className="pb-2">
+                            <CardTitle className="text-lg">Kids Tests This Year</CardTitle>
+                            <CardDescription>Total Kids tests conducted in {new Date().getFullYear()}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex items-center justify-between">
+                                <div className="text-3xl font-bold">{yearKidsTestCount}</div>
+                                <Activity className="h-8 w-8 text-blue-500" />
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
 
                 {/* Patients Table */}
@@ -223,7 +255,9 @@ export default function Dashboard({
                                                     'N/A'
                                                 }
                                             </TableCell>
-                                            <TableCell>{patient.test_records_count}</TableCell>
+                                            <TableCell>{patient.test_records_count }- Adult ||
+                                                {patient.child_readings_count} - Kids
+                                            </TableCell>
                                             <TableCell>
                                                 <Button variant="outline" size="sm" asChild>
                                                     <Link href={route('patients.show', patient.id)}>
@@ -267,7 +301,7 @@ export default function Dashboard({
                     </CardContent>
                 </Card>
             </div>
-            
+
         </AppLayout>
     );
 }

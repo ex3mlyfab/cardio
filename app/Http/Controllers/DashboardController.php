@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ChildReading;
 use App\Models\Patient;
 use App\Models\TestRecord;
 use Carbon\Carbon;
@@ -18,12 +19,14 @@ class DashboardController extends Controller
 
         // Count test records for current year
         $yearlyTestCount = TestRecord::whereYear('created_at', $currentYear)->count();
-
+        $yearlyKidsTestCount = ChildReading::whereYear('created_at', $currentYear)->count();
         // Count test records for current month
         $monthlyTestCount = TestRecord::whereYear('created_at', $currentYear)
             ->whereMonth('created_at', $currentMonth)
             ->count();
-
+        $monthlyKidsTestCount = ChildReading::whereYear('created_at', $currentYear)
+            ->whereMonth('created_at', $currentMonth)
+            ->count();
         // Get gender distribution for chart
         $maleCount = Patient::where('gender', 'Male')->count();
         $femaleCount = Patient::where('gender', 'Female')->count();
@@ -33,6 +36,7 @@ class DashboardController extends Controller
 
         $query = Patient::query()
             ->withCount('testRecords')
+            ->withCount('childReadings')
             ->when($search, function($query, $search) {
                 $query->where(function($query) use ($search) {
                     $query->where('surname', 'like', "%{$search}%")
@@ -47,6 +51,8 @@ class DashboardController extends Controller
         return Inertia::render('dashboard', [
             'yearlyTestCount' => $yearlyTestCount,
             'monthlyTestCount' => $monthlyTestCount,
+            'yearlyKidsTestCount' => $yearlyKidsTestCount,
+            'monthlyKidsTestCount' => $monthlyKidsTestCount,
             'genderData' => [
                 'male' => $maleCount,
                 'female' => $femaleCount

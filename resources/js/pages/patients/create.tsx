@@ -252,8 +252,8 @@ export default function CreatePatientPage() {
                                                     <TableHead className="border p-2">Surname</TableHead>
                                                     <TableHead className="border p-2">Other Names</TableHead>
                                                     <TableHead className="w-[100px] border p-2">Sex</TableHead>
-                                                    <TableHead className="border p-2">DOB</TableHead>
-                                                    <TableHead className="border p-2">NICL</TableHead>
+                                                    <TableHead className="border p-2" colSpan={2}>DOB</TableHead>
+                                                    
                                                 </TableRow>
                                             </TableHeader>
                                             <TableBody>
@@ -284,8 +284,8 @@ export default function CreatePatientPage() {
                                                             <InputError message={errors.gender} className="mt-2" />
                                                         </div>
                                                     </TableCell>
-                                                    <TableCell className="border p-2"> {renderInputField('date_of_birth', '', 'date')}</TableCell>
-                                                    <TableCell className="border p-2">{renderInputField('nicl', '')}</TableCell>
+                                                    <TableCell className="border p-2" colSpan={2}> {renderInputField('date_of_birth', '', 'date')}</TableCell>
+                                                   
                                                 </TableRow>
                                             </TableBody>
                                         </Table>
@@ -293,6 +293,7 @@ export default function CreatePatientPage() {
                                     <Table className="mt-1">
                                         <TableHeader>
                                             <TableRow>
+                                                <TableHead className="border p-2">NICL</TableHead>
                                                 <TableHead className="border p-2">TEST DATE</TableHead>
                                                 <TableHead className="border p-2">WEIGHT(kg)</TableHead>
                                                 <TableHead className="border p-2">WC(cm)</TableHead>
@@ -300,11 +301,12 @@ export default function CreatePatientPage() {
                                                 <TableHead className="border p-2">
                                                     BSA(m<sup>2</sup>)
                                                 </TableHead>
-                                                <TableHead className="border p-2">BP(mmHg)</TableHead>
+                                               
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
                                             <TableRow>
+                                                 <TableCell className="border p-2">{renderInputField('nicl', '')}</TableCell>
                                                 <TableCell className="border p-2">{renderInputField('test_date', '', 'date')}</TableCell>
                                                 <TableCell className="border p-2">
                                                     {' '}
@@ -320,7 +322,7 @@ export default function CreatePatientPage() {
                                                     })}
                                                 </TableCell>
                                                 <TableCell className="border p-2"> {renderInputField('bsa', '')}</TableCell>
-                                                <TableCell className="border p-2">{renderInputField('blood_pressure', '')}</TableCell>
+                                                
                                             </TableRow>
                                         </TableBody>
                                     </Table>

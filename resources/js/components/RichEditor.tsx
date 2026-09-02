@@ -55,6 +55,7 @@ export function RichEditor({
       attributes: {
         class: cn(
           'prose prose-sm dark:prose-invert prose-headings:text-base',
+          '[&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5',
           'min-h-[150px] max-h-[400px] w-full resize-none overflow-auto',
           'rounded-md border border-input bg-background px-3 py-2',
           'text-sm ring-offset-background placeholder:text-muted-foreground',

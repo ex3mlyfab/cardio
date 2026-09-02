@@ -401,17 +401,35 @@ export default function ShowTest({
 
                         {/* Report sections */}
                         <div className="space-y-4">
-                            {[
-                                { label: 'Pericardium', value: testRecord.recommendations },
-                                { label: 'Summary', value: testRecord.summary },
-                                { label: 'Conclusion', value: testRecord.conclusion },
-                                { label: "Doctor's Sign & Name", value: testRecord.doctor_name },
-                            ].map(({ label, value }) => (
-                                <div key={label} className="grid grid-cols-4 gap-5 text-sm rounded border p-4">
-                                    <h3 className="font-semibold text-sm mb-2">{label}</h3>
-                                    <p className="col-span-3">{value}</p>
-                                </div>
-                            ))}
+                            {/* Recommendations */}
+                            <div className="grid grid-cols-4 gap-5 text-sm rounded border p-4">
+                                <h3 className="font-semibold text-sm mb-2">Recommendations</h3>
+                                <p className="col-span-3">{testRecord.recommendations}</p>
+                            </div>
+
+                            {/* Summary - Rich Text */}
+                            <div className="grid grid-cols-4 gap-5 text-sm rounded border p-4">
+                                <h3 className="font-semibold text-sm mb-2">Summary</h3>
+                                <div 
+                                    className="col-span-3 prose prose-sm dark:prose-invert max-w-none"
+                                    dangerouslySetInnerHTML={{ __html: testRecord.summary || '' }}
+                                />
+                            </div>
+
+                            {/* Conclusion - Rich Text */}
+                            <div className="grid grid-cols-4 gap-5 text-sm rounded border p-4">
+                                <h3 className="font-semibold text-sm mb-2">Conclusion</h3>
+                                <div 
+                                    className="col-span-3 prose prose-sm dark:prose-invert max-w-none"
+                                    dangerouslySetInnerHTML={{ __html: testRecord.conclusion || '' }}
+                                />
+                            </div>
+
+                            {/* Doctor's Sign & Name */}
+                            <div className="grid grid-cols-4 gap-5 text-sm rounded border p-4">
+                                <h3 className="font-semibold text-sm mb-2">Doctor's Sign & Name</h3>
+                                <p className="col-span-3">{testRecord.doctor_name}</p>
+                            </div>
                         </div>
                     </div>
                 </div>

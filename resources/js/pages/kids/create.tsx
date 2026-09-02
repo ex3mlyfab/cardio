@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select"
 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { RichEditor } from '@/components/RichEditor';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -212,6 +213,18 @@ export default function CreateKidPage() {
                 placeholder={placeholder || label}
                 className="mt-1 block w-full"
                 onKeyDown={handleKeyDown}
+            />
+            <InputError message={errors[id]} className="mt-2" />
+        </div>
+    );
+
+    const renderRichEditorField = (id: 'summary' | 'conclusion', label: string, placeholder?: string) => (
+        <div className="grid gap-2">
+            <Label>{label}</Label>
+            <RichEditor
+                value={data[id]}
+                onChange={(content: string) => setData(id, content)}
+                placeholder={placeholder || label}
             />
             <InputError message={errors[id]} className="mt-2" />
         </div>
@@ -665,8 +678,8 @@ export default function CreateKidPage() {
                                             <InputError message={errors.recommendations} className="mt-2" />
 
                                         </div>
-                                        {renderTextareaField('summary', 'Summary', 'Summary of Findings')}
-                                        {renderTextareaField('conclusion', 'Conclusion', 'Conclusion')}
+                                        {renderRichEditorField('summary', 'Summary', 'Summary of Findings')}
+                                        {renderRichEditorField('conclusion', 'Conclusion', 'Conclusion')}
                                     </div>
 
                                     <div className={`mt-3`}>

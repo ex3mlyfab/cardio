@@ -70,8 +70,8 @@ return new class extends Migration
             $table->string('pasp')->nullable();
             $table->string('mpap')->nullable();
             $table->string('mvsp')->nullable();
-            $table->string('summary')->nullable();
-            $table->string('conclusion')->nullable();
+            $table->text('summary')->nullable();
+            $table->text('conclusion')->nullable();
             $table->string('sign')->nullable();
 
             $table->timestamps();

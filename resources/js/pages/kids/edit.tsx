@@ -234,7 +234,7 @@ patient: {
             onSuccess: (id) => {
                 console.log('Patient created successfully!');
                 // You can redirect the user to the patient's profile page or any other page
-                window.location.href = route('patients.showTestRecord', { testRecord: id });
+                window.location.href = route('kids.show', { testRecord: id });
             },
         });
     };

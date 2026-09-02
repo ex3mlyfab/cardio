@@ -2,7 +2,25 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import laravel from 'laravel-vite-plugin';
 import { resolve } from 'node:path';
+import { readdirSync } from 'node:fs';
 import { defineConfig } from 'vite';
+
+function getPageEntries(basePath: string): string[] {
+	const entries: string[] = [];
+	const pagesDir = resolve(basePath, 'resources/js/pages');
+	function walk(dir: string) {
+		for (const entry of readdirSync(dir, { withFileTypes: true })) {
+			const fullPath = resolve(dir, entry.name);
+			if (entry.isDirectory()) {
+				walk(fullPath);
+			} else if (entry.name.endsWith('.tsx')) {
+				entries.push(fullPath);
+			}
+		}
+	}
+	walk(pagesDir);
+	return entries;
+}
 
 export default defineConfig({
 	server: {
@@ -18,7 +36,7 @@ export default defineConfig({
 	},
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.tsx'],
+            input: ['resources/css/app.css', 'resources/js/app.tsx', ...getPageEntries(process.cwd())],
             ssr: 'resources/js/ssr.tsx',
             refresh: true,
         }),

@@ -92,43 +92,13 @@ export default function ShowTest({ testRecord }: {
     }
 }) {
     const handlePrint = useCallback(() => {
-        const printContents = document.getElementById('testRecord')?.innerHTML;
-        if (printContents) {
-            const printWindow = window.open('', '_blank');
-            if (printWindow) {
-                printWindow.document.write(`
-                    <!DOCTYPE html>
-                    <html>
-                        <head>
-                            <title>Test Record - ${testRecord.patient?.surname || 'Patient'} ${testRecord.patient?.other_names || ''}</title>
-                            <style>
-                                body { font-family: Arial, sans-serif; margin: 10px 55px; }
-                                table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-                                th, td { border: 2px solid #ddd; padding: 2px 2px 2px 5px; font-size: 12px; }
-                                th { background-color: #f2f2f2; }
-                                h2, h3 { margin-top: 4px; font-size: 14px; }
-                                @media print { button { display: none; } }
-                            </style>
-                        </head>
-                        <body>
-                            <div>
-                                ${printContents}
-                                <div style="text-align: center; margin-top: 30px;">
-                                    <button onclick="window.print(); window.close();">Print</button>
-                                </div>
-                            </div>
-                        </body>
-                    </html>
-                `);
-                printWindow.document.close();
-            }
-        }
-    }, [testRecord]);
+        window.print();
+    }, []);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Test Record Details" />
-            <div className="mb-4 flex justify-between">
+            <div className="no-print mb-4 flex justify-between">
                 <Button variant="secondary">
                     <Link href={route('patients.editTest', testRecord.id)} className="flex justify-center">
                         <FilePenLine className="mr-1 h-4 w-4" />

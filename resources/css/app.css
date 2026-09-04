@@ -157,3 +157,39 @@
         @apply bg-background text-foreground;
     }
 }
+
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    body {
+        background: white !important;
+        color: black !important;
+        margin: 0;
+    }
+
+    #testRecord {
+        display: block !important;
+        width: 100% !important;
+        max-width: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    #testRecord * {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+
+    table {
+        width: 100% !important;
+        border-collapse: collapse;
+    }
+
+    th,
+    td {
+        border: 1px solid #d1d5db !important;
+        padding: 4px 6px !important;
+    }
+}

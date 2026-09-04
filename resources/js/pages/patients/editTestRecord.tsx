@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import InputError from '@/components/input-error';
+import { RichEditor } from '@/components/RichEditor';
 import {
     Table,
     TableBody,
@@ -265,6 +266,18 @@ export default function EditTestRecordPage({ data: testRecord }: { data: {
                 onChange={(e) => setData(id, e.target.value)}
                 placeholder={placeholder || label}
                 className="mt-1 block w-full"
+            />
+            <InputError message={errors[id]} className="mt-2" />
+        </div>
+    );
+
+    const renderRichEditorField = (id: 'summary' | 'conclusion', label: string, placeholder?: string) => (
+        <div className="grid gap-2">
+            <Label htmlFor={id}>{label}</Label>
+            <RichEditor
+                value={data[id]}
+                onChange={(content) => setData(id, content)}
+                placeholder={placeholder || label}
             />
             <InputError message={errors[id]} className="mt-2" />
         </div>
@@ -649,8 +662,8 @@ export default function EditTestRecordPage({ data: testRecord }: { data: {
                                                                         </Select>
                                                                         <InputError message={errors.gender} className="mt-2" />
                                                                     </div>
-                                                                    {renderTextareaField('summary', 'Summary', 'Optional')}
-                                                                    {renderTextareaField('conclusion', 'Conclusion', 'Optional')}
+                                                                    {renderRichEditorField('summary', 'Summary', 'Summary of Findings')}
+                                                                    {renderRichEditorField('conclusion', 'Conclusion', 'Conclusion')}
                                                                 </div>
                                                                 <div className="mt-3">
                                                                     <Label>Signed:</Label>

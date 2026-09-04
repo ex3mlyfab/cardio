@@ -256,7 +256,7 @@ export default function ShowTest({ testRecord }: {
                                     </TableHeader>
                                     <TableBody>
                                         <TableRow>
-                                            <TableCell className="border p-2">{testRecord.test_date}</TableCell>
+                                            <TableCell className="border p-2">{new Date(testRecord.test_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</TableCell>
                                             <TableCell className="border p-2">{testRecord.weight}</TableCell>
                                             <TableCell className="border p-2">{testRecord.wc_cm}</TableCell>
                                             <TableCell className="border p-2">{testRecord.height}</TableCell>

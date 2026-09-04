@@ -144,9 +144,9 @@ export default function ShowTest({ testRecord }: {
                 <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl border p-4 md:p-6">
                     <div className="space-y-8">
                         {/* Header row: logo + patient details */}
-                        <div className="grid grid-cols-3 gap-2 items-center">
+                        <div className="grid grid-cols-3 gap-2 items-center border rounded-lg">
                             <div className="flex flex-col items-center justify-center border rounded-lg p-2.5">
-                                <img src="/fmc_logo.jpeg" className="w-24 h-24 object-contain" alt="FMC Logo" />
+                                <img src="/fmc_logo.jpeg" width={24} height={24} className="w-24 h-24 object-contain" alt="FMC Logo" />
                                 <h6 className="text-[11px] text-center m-0 p-0">FEDERAL MEDICAL CENTRE</h6>
                                 <h6 className="text-[11px] m-0 p-0">JABI - AIRPORT ROAD ABUJA</h6>
                                 <h6 className="text-[11px] m-0 p-0">ECHOCARDIOGRAPHY LABORATORY</h6>

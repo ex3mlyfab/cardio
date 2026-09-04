@@ -92,8 +92,108 @@ export default function ShowTest({ testRecord }: {
     }
 }) {
     const handlePrint = useCallback(() => {
-        window.print();
-    }, []);
+        const printContents = document.getElementById('testRecord')?.innerHTML;
+        if (!printContents) return;
+
+        const printWindow = window.open('', '_blank', 'width=1200,height=900');
+        if (!printWindow) return;
+
+        const cssLinks = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
+            .map((link) => link.outerHTML)
+            .join('\n');
+
+        printWindow.document.open();
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <meta charset="UTF-8" />
+                    <title>Test Record - ${testRecord.patient?.surname || 'Patient'} ${testRecord.patient?.other_names || ''}</title>
+                    ${cssLinks}
+                    <style>
+                        html, body {
+                            margin: 0;
+                            padding: 0;
+                            background: #ffffff;
+                            color: #111827;
+                            font-family: Arial, sans-serif;
+                        }
+                        body {
+                            padding: 10px 18px;
+                            font-size: 11px;
+                        }
+                        #testRecord {
+                            display: block !important;
+                            padding: 0 !important;
+                            margin: 0 !important;
+                        }
+                        #testRecord > div {
+                            padding: 0.35rem !important;
+                        }
+                        #testRecord .space-y-8 > * + *,
+                        #testRecord .space-y-4 > * + * {
+                            margin-top: 0.2rem !important;
+                        }
+                        #testRecord .gap-5,
+                        #testRecord .gap-2 {
+                            gap: 0.25rem !important;
+                        }
+                        #testRecord .grid {
+                            gap: 0.25rem !important;
+                        }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-top: 0 !important;
+                            table-layout: fixed;
+                        }
+                        th, td {
+                            border: 1px solid #d1d5db;
+                            padding: 2px 4px !important;
+                            font-size: 10.5px;
+                            vertical-align: top;
+                            line-height: 1.2;
+                        }
+                        th {
+                            background-color: #f2f2f2;
+                        }
+                        h2, h3, h6 {
+                            margin: 0 0 2px 0;
+                            font-size: 12px;
+                        }
+                        p, div {
+                            margin: 0;
+                        }
+                        img {
+                            max-width: 100%;
+                            height: auto;
+                        }
+                        .mt-1 {
+                            margin-top: 0 !important;
+                        }
+                        .rounded-xl, .rounded-lg, .rounded {
+                            border-radius: 0 !important;
+                        }
+                        @media print {
+                            body {
+                                margin: 0;
+                                padding: 0;
+                            }
+                            button {
+                                display: none !important;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${printContents}
+                </body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
+    }, [testRecord]);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

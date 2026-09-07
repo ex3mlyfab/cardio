@@ -135,7 +135,7 @@ class PatientController extends Controller
             'sign' => 'nullable|string',
             'doctor_name' => 'nullable|string', // Optional field for doctor's name
         ]);
-        DB::transaction(function () use ($validated) {
+        $testRecord = DB::transaction(function () use ($validated) {
             $patient = Patient::updateOrCreate(
                 ['hospital_id' => $validated['hospital_id']],
                 [
@@ -146,7 +146,7 @@ class PatientController extends Controller
                     'nicl' => $validated['nicl'],
                 ]
             );
-            $testRecord = TestRecord::create([
+            return TestRecord::create([
                 'patient_id' => $patient->id,
                 'test_date' => $validated['test_date'],
                 'weight' => $validated['weight'],
@@ -206,7 +206,6 @@ class PatientController extends Controller
             ]);
         });
 
-        // Redirect or return response
         $testRecord->load('patient');
        return Inertia::render('patients/showTest', [
             'testRecord' => $testRecord,
@@ -230,7 +229,7 @@ class PatientController extends Controller
             'testRecord' => $testRecord,
         ]);
     }
-    Public function edit(Patient $patient)
+    public function edit(Patient $patient)
     {
         return Inertia::render('patients/edit', [
             'patient' => $patient,

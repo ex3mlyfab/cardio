@@ -281,7 +281,7 @@ export default function CreatePatientPage() {
                                                                     <SelectItem value="female">Female</SelectItem>
                                                                 </SelectContent>
                                                             </Select>
-                                                            <InputError message={errors.gender} className="mt-2" />
+                                            <InputError message={errors.pericardium} className="mt-2" />
                                                         </div>
                                                     </TableCell>
                                                     <TableCell className="border p-2" colSpan={2}> {renderInputField('date_of_birth', '', 'date')}</TableCell>
@@ -605,7 +605,7 @@ export default function CreatePatientPage() {
                                                     <SelectItem value="Abnormal">Abnormal</SelectItem>
                                                 </SelectContent>
                                             </Select>
-                                            <InputError message={errors.gender} className="mt-2" />
+                                            <InputError message={errors.pericardium} className="mt-2" />
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-1 gap-6 mt-6 lg:grid-cols-2">

@@ -1,3 +1,4 @@
+import React from 'react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,8 +28,6 @@ const TabsList = React.forwardRef<React.ElementRef<typeof TabsPrimitive.List>, R
     ),
 );
 TabsList.displayName = TabsPrimitive.List.displayName;
-
-import React from 'react';
 
 const TabsTrigger = React.forwardRef<React.ElementRef<typeof TabsPrimitive.Trigger>, React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>>(
     ({ className, ...props }, ref) => (

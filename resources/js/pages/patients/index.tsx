@@ -146,7 +146,7 @@ export default function PatientsIndex({ tests, filters }: PatientsIndexProps) {
                         <Table aria-label="Test records list">
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead scope="col">Diagnosis</TableHead>
+                                    <TableHead scope="col" className='w-[200px]'>Diagnosis</TableHead>
                                     <TableHead scope="col">Surname</TableHead>
                                     <TableHead scope="col">Other Names</TableHead>
                                     <TableHead scope="col">Hospital ID</TableHead>
@@ -164,7 +164,12 @@ export default function PatientsIndex({ tests, filters }: PatientsIndexProps) {
                                 ) : (
                                     tests.data.map((test) => (
                                         <TableRow key={test.id}>
-                                            <TableCell>{test.conclusion || 'No diagnosis'}</TableCell>
+                                            <TableCell>
+                                                <div
+                                                    className="line-clamp-2 max-w-[200px] text-sm"
+                                                    dangerouslySetInnerHTML={{ __html: test.conclusion || 'No diagnosis' }}
+                                                />
+                                            </TableCell>
                                             <TableCell>{test.patient.surname}</TableCell>
                                             <TableCell>{test.patient.other_names}</TableCell>
                                             <TableCell>{test.patient.hospital_id}</TableCell>

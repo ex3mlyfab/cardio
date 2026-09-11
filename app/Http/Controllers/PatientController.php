@@ -106,9 +106,11 @@ class PatientController extends Controller
             'e_wave_dt' => 'nullable|numeric', // Consider 'numeric' if applicable
             'e_lat' => 'nullable|numeric', // Consider 'numeric' if applicable
             'a_lat' => 'nullable|numeric', // Consider 'numeric' if applicable
-            's_lat' => 'nullable|numeric', // Consider 'numeric' if applicable
             'e_e' => 'nullable|numeric', // Consider 'numeric' if applicable
             'ivrt' => 'nullable|numeric', // Consider 'numeric' if applicable
+            'e_ave' => 'nullable|numeric',
+            'lavi' => 'nullable|numeric',
+            'pulmonary_vein_sd' => 'nullable|numeric',
             // Doppler measurements
             'aortic_valve_peak' => 'nullable|numeric', // Consider 'numeric' if applicable
             'aortic_valve_press' => 'nullable|numeric', // Consider 'numeric' if applicable
@@ -118,8 +120,6 @@ class PatientController extends Controller
             'triscupid_regurg_press' => 'nullable|numeric', // Consider 'numeric' if applicable
             'mitral_regurg_peak' => 'nullable|numeric', // Consider 'numeric' if applicable
             'mitral_regurg_press' => 'nullable|numeric', // Consider 'numeric' if applicable
-            'aortic_regurg_peak' => 'nullable|numeric', // Consider 'numeric' if applicable
-            'aortic_regurg_press' => 'nullable|numeric', // Consider 'numeric' if applicable
             'mitral_stenosis' => 'nullable|numeric', // Consider 'numeric' if applicable
             'inferior_vena_cava_insp' => 'nullable|numeric', // Consider 'numeric' if applicable
             'inferior_vena_cava_expi' => 'nullable|numeric', // Consider 'numeric' if applicable
@@ -127,7 +127,9 @@ class PatientController extends Controller
             // Consider 'numeric' if applicable
             'pasp' => 'nullable|numeric',
             'mpap'  => 'nullable|numeric',
-            'mvsp' => 'nullable|numeric',
+            'arpht' => 'nullable|numeric',
+            'arvc' => 'nullable|numeric',
+            'nrvc' => 'nullable|numeric',
             'est_right' => 'nullable|numeric',
             'pericardium' => 'nullable|string',
             'summary' => 'nullable|string', // Text fields might not need max length
@@ -177,9 +179,11 @@ class PatientController extends Controller
                 'e_wave_dt' => $validated['e_wave_dt'],
                 'e_lat' => $validated['e_lat'],
                 'a_lat' => $validated['a_lat'],
-                's_lat' => $validated['s_lat'],
                 'e_e' => $validated['e_e'],
                 'ivrt' => $validated['ivrt'],
+                'e_ave' => $validated['e_ave'],
+                'lavi' => $validated['lavi'],
+                'pulmonary_vein_sd' => $validated['pulmonary_vein_sd'],
                 'aortic_valve_peak' => $validated['aortic_valve_peak'],
                 'aortic_valve_press' => $validated['aortic_valve_press'],
                 'pulmonary_valve_press' => $validated['pulmonary_valve_press'],
@@ -188,15 +192,15 @@ class PatientController extends Controller
                 'triscupid_regurg_press' => $validated['triscupid_regurg_press'],
                 'mitral_regurg_peak' => $validated['mitral_regurg_peak'],
                 'mitral_regurg_press' => $validated['mitral_regurg_press'],
-                'aortic_regurg_peak' => $validated['aortic_regurg_peak'],
-                'aortic_regurg_press' => $validated['aortic_regurg_press'],
                 'mitral_stenosis' => $validated['mitral_stenosis'],
                 'inferior_vena_cava_insp' => $validated['inferior_vena_cava_insp'],
                 'inferior_vena_cava_expi' => $validated['inferior_vena_cava_expi'],
                 'inferior_vena_cava_diam' => $validated['inferior_vena_cava_diam'],
                 'pasp' => $validated['pasp'],
                 'mpap' => $validated['mpap'],
-                'mvsp' => $validated['mvsp'],
+                'arpht' => $validated['arpht'],
+                'arvc' => $validated['arvc'],
+                'nrvc' => $validated['nrvc'],
                 'est_right' => $validated['est_right'],
                 'pericardium' => $validated['pericardium'],
                 'summary' => $validated['summary'],
@@ -276,9 +280,11 @@ class PatientController extends Controller
             'e_wave_dt' => 'nullable|numeric',
             'e_lat' => 'nullable|numeric',
             'a_lat' => 'nullable|numeric',
-            's_lat' => 'nullable|numeric',
             'e_e' => 'nullable|numeric',
             'ivrt' => 'nullable|numeric',
+            'e_ave' => 'nullable|numeric',
+            'lavi' => 'nullable|numeric',
+            'pulmonary_vein_sd' => 'nullable|numeric',
             // Doppler measurements
             'aortic_valve_peak' => 'nullable|numeric',
             'aortic_valve_press' => 'nullable|numeric',
@@ -288,15 +294,15 @@ class PatientController extends Controller
             'triscupid_regurg_press' => 'nullable|string',
             'mitral_regurg_peak' => 'nullable|string',
             'mitral_regurg_press' => 'nullable|string',
-            'aortic_regurg_peak' => 'nullable|string',
-            'aortic_regurg_press' => 'nullable|string',
             'mitral_stenosis' => 'nullable|string',
             'inferior_vena_cava_insp' => 'nullable|string',
             'inferior_vena_cava_expi' => 'nullable|string',
             'inferior_vena_cava_diam' => 'nullable|string',
             'pasp' => 'nullable|numeric',
             'mpap'  => 'nullable|numeric',
-            'mvsp' => 'nullable|numeric',
+            'arpht' => 'nullable|numeric',
+            'arvc' => 'nullable|numeric',
+            'nrvc' => 'nullable|numeric',
             'est_right' => 'nullable|string',
             'pericardium' => 'nullable|string',
             'summary' => 'nullable|string',

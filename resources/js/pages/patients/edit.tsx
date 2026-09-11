@@ -67,7 +67,9 @@ export default function CreatePatientPage() {
         e_wave_dt: '',
         e_lat: '',
         a_lat: '',
-        s_lat: '',
+        e_ave: '',
+        lavi: '',
+        pulmonary_vein_sd: '',
         e_e: '',
         ivrt: '',
         // Doppler measurements
@@ -79,8 +81,8 @@ export default function CreatePatientPage() {
         triscupid_regurg_press: '',
         mitral_regurg_peak: '',
         mitral_regurg_press: '',
-        aortic_regurg_peak: '',
-        aortic_regurg_press: '',
+        arpht: '',
+        arvc: '',
         mitral_stenosis: '',
         inferior_vena_cava_insp: '',
         inferior_vena_cava_expi: '',
@@ -171,7 +173,7 @@ export default function CreatePatientPage() {
         }
     ) => (
         <div className="grid gap-2">
-            <Label htmlFor={id}>{label}</Label>
+            {label ? <Label htmlFor={id} className="text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">{label}</Label> : null}
             <Input
                 id={id}
                 name={id}
@@ -179,26 +181,26 @@ export default function CreatePatientPage() {
                 value={data[id]}
                 onChange={(e) => setData(id, e.target.value)}
                 placeholder={placeholder || label}
-                className="mt-1 block w-full"
+                className="mt-1 block w-full rounded-xl border border-input bg-background px-3 py-2 text-sm shadow-none transition-colors focus-visible:border-ring"
                 autoFocus={config?.autoFocus}
                 onBlur={config?.onBlur}
             />
-            <InputError message={errors[id]} className="mt-2" />
+            <InputError message={errors[id]} className="mt-1 text-xs" />
         </div>
     );
 
     const renderTextareaField = (id: keyof typeof data, label: string, placeholder?: string) => (
         <div className="grid gap-2">
-            <Label htmlFor={id}>{label}</Label>
+            <Label htmlFor={id} className="text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">{label}</Label>
             <Textarea
                 id={id}
                 name={id}
                 value={data[id]}
                 onChange={(e) => setData(id, e.target.value)}
                 placeholder={placeholder || label}
-                className="mt-1 block w-full"
+                className="mt-1 block w-full rounded-xl border border-input bg-background px-3 py-2 text-sm shadow-none transition-colors focus-visible:border-ring"
             />
-            <InputError message={errors[id]} className="mt-2" />
+            <InputError message={errors[id]} className="mt-1 text-xs" />
         </div>
     );
 
@@ -217,10 +219,8 @@ export default function CreatePatientPage() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Patient and Test Record" />
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-
-                {/* Form Container */}
-                <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl border p-4 md:p-6">
+            <div className="flex h-full flex-1 flex-col gap-4 rounded-[1.25rem] p-3 md:p-5">
+                <div className="relative flex-1 overflow-hidden rounded-[1.25rem] border border-border/80 bg-card p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_12px_30px_rgba(15,23,42,0.04)] md:p-6">
                     <form onSubmit={submit} className="space-y-8">
                         <div>
                             <h2 className="mb-4 text-xl font-semibold">Patient Details</h2>
@@ -387,9 +387,17 @@ export default function CreatePatientPage() {
                                     <TableCell className="border p-1"> E/A</TableCell>
                                     <TableCell className="border p-1"> </TableCell>
                                     <TableCell className="border p-1"> {renderInputField('e_a', '', 'number', '')}</TableCell>
-                                    <TableCell className="border p-1"> S' (lat)(m/s)</TableCell>
+                                    <TableCell className="border p-1"> E' (ave)(m/s)</TableCell>
                                     <TableCell className="border p-1"> </TableCell>
-                                    <TableCell className="border p-1"> {renderInputField('s_lat', '', 'number', '')}</TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('e_ave', '', 'number', '')}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell className="border p-1"> LAVI(ml/m2)</TableCell>
+                                    <TableCell className="border p-1"> </TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('lavi', '', 'number', '')}</TableCell>
+                                    <TableCell className="border p-1"> Pulmonary vein (S/D)</TableCell>
+                                    <TableCell className="border p-1"> </TableCell>
+                                    <TableCell className="border p-1"> {renderInputField('pulmonary_vein_sd', '', 'number', '')}</TableCell>
                                 </TableRow>
                                 <TableRow>
                                     <TableCell className="border p-1"> E wave DT(m/s)</TableCell>
@@ -448,8 +456,8 @@ export default function CreatePatientPage() {
                                 {renderInputField('triscupid_regurg_press', 'Triscupid Regurgitation (Peak pressure gradient)', 'text', 'Optional')}
                                 {renderInputField('mitral_regurg_peak', 'Mitral Regurgitation (Peak Velocity)', 'text', 'Optional')}
                                 {renderInputField('mitral_regurg_press', 'Mitral Regurgitation (Pressure Gradient)', 'text', 'Optional')}
-                                {renderInputField('aortic_regurg_peak', 'Aortic Regurgitation (Peak Velocity)', 'text', 'Optional')}
-                                {renderInputField('aortic_regurg_press', 'Aortic Regurgitation (Pressure Gradient)', 'text', 'Optional')}
+                                {renderInputField('arpht', 'ARPHT (ms)', 'text', 'Optional')}
+                                {renderInputField('arvc', 'ARVC', 'text', 'Optional')}
                                 {renderInputField('mitral_stenosis', 'Mitral Stenosis(Valve Area) ', 'text', 'Optional')}
                                 {renderInputField('inferior_vena_cava_insp', 'Inferior Vena Cava (Diameter in Inspiration)', 'text', 'Optional')}
                                 {renderInputField('inferior_vena_cava_expi', 'Inferior Vena Cava (Diameter in Expiration)', 'text', 'Optional')}

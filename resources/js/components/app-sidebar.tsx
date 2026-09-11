@@ -37,24 +37,28 @@ const mainNavItems: NavItem[] = [
 
 export function AppSidebar() {
     return (
-        <Sidebar collapsible="icon" variant="inset">
-            <SidebarHeader>
+        <Sidebar collapsible="icon" variant="inset" className="border-r border-sidebar-border/80 bg-sidebar/95">
+            <SidebarHeader className="border-b border-sidebar-border/80 px-2 py-3">
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
-                            <Link href="/dashboard" prefetch>
+                        <SidebarMenuButton size="lg" asChild className="h-12 rounded-xl px-2 hover:bg-sidebar-accent/70">
+                            <Link href="/dashboard" prefetch className="flex w-full items-center gap-3">
                                 <AppLogo />
+                                <div className="flex flex-col items-start leading-none text-left">
+                                    <span className="text-sm font-semibold text-sidebar-foreground">Cardio</span>
+                                    <span className="text-[10px] uppercase tracking-[0.18em] text-sidebar-foreground/60">Clinical records</span>
+                                </div>
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarHeader>
 
-            <SidebarContent>
+            <SidebarContent className="px-2 py-3">
                 <NavMain items={mainNavItems} />
             </SidebarContent>
 
-            <SidebarFooter>
+            <SidebarFooter className="border-t border-sidebar-border/80 p-2">
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

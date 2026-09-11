@@ -184,7 +184,7 @@ export default function CreateKidPage() {
         }
     ) => (
         <div className="grid gap-2">
-            <Label htmlFor={id}>{label}</Label>
+            {label ? <Label htmlFor={id} className="text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">{label}</Label> : null}
             <Input
                 id={id}
                 name={id}
@@ -192,29 +192,29 @@ export default function CreateKidPage() {
                 value={data[id]}
                 onChange={(e) => setData(id, e.target.value)}
                 placeholder={placeholder || label}
-                className="mt-1 block w-full border-0 border-b"
+                className="mt-1 block w-full rounded-xl border border-input bg-background px-3 py-2 text-sm shadow-none transition-colors focus-visible:border-ring"
                 autoFocus={config?.autoFocus}
                 readOnly={id === 'bsa'}
                 onBlur={config?.onBlur}
                 onKeyDown={handleKeyDown}
             />
-            <InputError message={errors[id]} className="mt-2" />
+            <InputError message={errors[id]} className="mt-1 text-xs" />
         </div>
     );
 
     const renderTextareaField = (id: keyof typeof data, label: string, placeholder?: string) => (
         <div className="grid gap-2">
-            <Label htmlFor={id}>{label}</Label>
+            <Label htmlFor={id} className="text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">{label}</Label>
             <Textarea
                 id={id}
                 name={id}
                 value={data[id]}
                 onChange={(e) => setData(id, e.target.value)}
                 placeholder={placeholder || label}
-                className="mt-1 block w-full"
+                className="mt-1 block w-full rounded-xl border border-input bg-background px-3 py-2 text-sm shadow-none transition-colors focus-visible:border-ring"
                 onKeyDown={handleKeyDown}
             />
-            <InputError message={errors[id]} className="mt-2" />
+            <InputError message={errors[id]} className="mt-1 text-xs" />
         </div>
     );
 
@@ -233,10 +233,9 @@ export default function CreateKidPage() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create New Paediatric Test Record" />
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                {/*show all validation errors */}
+            <div className="flex h-full flex-1 flex-col gap-4 rounded-[1.25rem] p-3 md:p-5">
                 {Object.keys(errors).length > 0 && (
-                    <div className="mb-4 rounded-lg bg-red-100 p-4 text-red-700">
+                    <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 shadow-sm">
                         <ul className="list-disc space-y-1 pl-5">
                             {Object.values(errors).map((error, index) => (
                                 <li key={index}>{error}</li>
@@ -244,20 +243,19 @@ export default function CreateKidPage() {
                         </ul>
                     </div>
                 )}
-                {/* Form Container */}
                 <div className="flex justify-end">
-                    <Button>
+                    <Button className="rounded-xl bg-primary text-primary-foreground shadow-sm hover:-translate-y-0.5">
                         <a href="/kids/">Back to Test List</a>
                     </Button>
                 </div>
-                <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl border p-4 md:p-6">
+                <div className="relative flex-1 overflow-hidden rounded-[1.25rem] border border-border/80 bg-card p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_12px_30px_rgba(15,23,42,0.04)] md:p-6">
                     <form onSubmit={submit} className="space-y-8" onKeyDown={handleKeyDown}>
                         <Tabs defaultValue="patient-details" className="w-full">
-                            <TabsList className="mb-4 w-full justify-start">
-                                <TabsTrigger value="patient-details">Initial Info</TabsTrigger>
-                                <TabsTrigger value="dimensions">2D Summary</TabsTrigger>
-                                <TabsTrigger value="diastolic-function">Doppler Measurements</TabsTrigger>
-                                <TabsTrigger value="report">Additional Information</TabsTrigger>
+                            <TabsList className="mb-4 w-full justify-start rounded-xl bg-muted p-1">
+                                <TabsTrigger value="patient-details" className="rounded-lg px-3 py-2 text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm">Initial Info</TabsTrigger>
+                                <TabsTrigger value="dimensions" className="rounded-lg px-3 py-2 text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm">2D Summary</TabsTrigger>
+                                <TabsTrigger value="diastolic-function" className="rounded-lg px-3 py-2 text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm">Doppler Measurements</TabsTrigger>
+                                <TabsTrigger value="report" className="rounded-lg px-3 py-2 text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm">Additional Information</TabsTrigger>
                             </TabsList>
 
                             {/* Patient Details Tab */}

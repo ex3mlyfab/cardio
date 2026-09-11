@@ -79,7 +79,9 @@ export default function EditTestRecordPage({ data: testRecord }: { data: {
     e_wave_dt: string;
     e_lat: string;
     a_lat: string;
-    s_lat: string;
+    e_ave: string;
+    lavi: string;
+    pulmonary_vein_sd: string;
     e_e: string;
     ivrt: string;
     aortic_valve_peak: string;
@@ -90,15 +92,15 @@ export default function EditTestRecordPage({ data: testRecord }: { data: {
     triscupid_regurg_press: string;
     mitral_regurg_peak: string;
     mitral_regurg_press: string;
-    aortic_regurg_peak: string;
-    aortic_regurg_press: string;
     mitral_stenosis: string;
     inferior_vena_cava_insp: string;
     inferior_vena_cava_expi: string;
     inferior_vena_cava_diam: string;
     pasp: string;
-    mvsp: string;
     mpap: string;
+    arpht: string;
+    arvc: string;
+    nrvc: string;
     est_right: string;
     pericardium: string;
     summary: string;
@@ -146,7 +148,9 @@ export default function EditTestRecordPage({ data: testRecord }: { data: {
         e_wave_dt: testRecord.e_wave_dt || '',
         e_lat: testRecord.e_lat || '',
         a_lat: testRecord.a_lat || '',
-        s_lat: testRecord.s_lat || '',
+        e_ave: testRecord.e_ave || '',
+        lavi: testRecord.lavi || '',
+        pulmonary_vein_sd: testRecord.pulmonary_vein_sd || '',
         e_e: testRecord.e_e || '',
         ivrt: testRecord.ivrt || '',
         // Doppler measurements
@@ -158,8 +162,6 @@ export default function EditTestRecordPage({ data: testRecord }: { data: {
         triscupid_regurg_press: testRecord.triscupid_regurg_press || '',
         mitral_regurg_peak: testRecord.mitral_regurg_peak || '',
         mitral_regurg_press: testRecord.mitral_regurg_press || '',
-        aortic_regurg_peak: testRecord.aortic_regurg_peak || '',
-        aortic_regurg_press: testRecord.aortic_regurg_press || '',
         mitral_stenosis: testRecord.mitral_stenosis || '',
         inferior_vena_cava_insp: testRecord.inferior_vena_cava_insp || '',
         inferior_vena_cava_expi: testRecord.inferior_vena_cava_expi || '',
@@ -167,7 +169,9 @@ export default function EditTestRecordPage({ data: testRecord }: { data: {
         est_right: testRecord.est_right || '',
         pericardium: testRecord.pericardium || '',
         mpap: testRecord.mpap || '',
-        mvsp: testRecord.mvsp || '',
+        arpht: testRecord.arpht || '',
+        arvc: testRecord.arvc || '',
+        nrvc: testRecord.nrvc || '',
         pasp: testRecord.pasp || '',
         summary: testRecord.summary || '',
         conclusion: testRecord.conclusion || '',
@@ -214,20 +218,17 @@ export default function EditTestRecordPage({ data: testRecord }: { data: {
     };
     const handleRVSPCalc: FocusEventHandler<HTMLInputElement> = async () => {
         if (data.triscupid_regurg_peak) {
-            const rvsp = Math.pow(Number(data.triscupid_regurg_peak), 2);
-            setData('mvsp', rvsp.toFixed(2));
+            const nrvc = Math.pow(Number(data.triscupid_regurg_peak), 2);
+            setData('nrvc', nrvc.toFixed(2));
         }
     }
     const handlePASPCalc: FocusEventHandler<HTMLInputElement> = async () => {
-        if (data.mvsp && data.est_right) {
-            const pasp = Number(data.mvsp) + Number(data.est_right);
+        if (data.nrvc && data.est_right) {
+            const pasp = Number(data.nrvc) + Number(data.est_right);
             setData('pasp', pasp.toFixed(2));
             const mpap = (0.61 * Number(data.pasp)) + 2;
             setData('mpap', mpap.toFixed(2));
         }
-
-
-
     }
     const renderInputField = (
         id: keyof typeof data,
@@ -497,8 +498,15 @@ export default function EditTestRecordPage({ data: testRecord }: { data: {
                                                                         <TableCell className="border p-1"> IVRT(m/s)</TableCell>
                                                                         <TableCell className="border p-1"> {renderInputField('ivrt', '', 'number', '')}</TableCell>
 
-                                                                        <TableCell className="border p-1"> S' (lat)(m/s)</TableCell>
-                                                                        <TableCell className="border p-1"> {renderInputField('s_lat', '', 'number', '')}</TableCell>
+                                                                    </TableRow>
+
+                                                                    <TableRow>
+                                                                        <TableCell className="border p-1"> E' (ave)(m/s)</TableCell>
+                                                                        <TableCell className="border p-1"> {renderInputField('e_ave', '', 'number', '')}</TableCell>
+                                                                        <TableCell className="border p-1"> LAVI(ml/m<sup>2</sup>)</TableCell>
+                                                                        <TableCell className="border p-1"> {renderInputField('lavi', '', 'number', '')}</TableCell>
+                                                                        <TableCell className="border p-1"> Pulmonary vein (S/D)</TableCell>
+                                                                        <TableCell className="border p-1"> {renderInputField('pulmonary_vein_sd', '', 'number', '')}</TableCell>
                                                                     </TableRow>
 
                                                                     <TableRow>
@@ -592,16 +600,16 @@ export default function EditTestRecordPage({ data: testRecord }: { data: {
                                                                                 {renderInputField('mitral_regurg_press', '', 'number', '')}
                                                                             </TableCell>
                                                                             <TableCell className="border p-1">
-                                                                                ARV<sub>max</sub>
+                                                                                ARPHT(ms)
                                                                             </TableCell>
                                                                             <TableCell className="border p-1">
-                                                                                {renderInputField('aortic_regurg_peak', '', 'number', '')}
+                                                                                {renderInputField('arpht', '', 'number', '')}
                                                                             </TableCell>
                                                                             <TableCell className="border p-1">
-                                                                                AR<sub>max</sub>PG
+                                                                                ARVC
                                                                             </TableCell>
                                                                             <TableCell className="border p-1">
-                                                                                {renderInputField('aortic_regurg_press', '', 'number', '')}
+                                                                                {renderInputField('arvc', '', 'number', '')}
                                                                             </TableCell>
                                                                         </TableRow>
                                                                         <TableRow>
@@ -639,8 +647,8 @@ export default function EditTestRecordPage({ data: testRecord }: { data: {
                                                                         <TableRow>
                                                                             <TableCell className="border p-1">MPAP</TableCell>
                                                                             <TableCell className="border p-1">{renderInputField('mpap', '', 'number', '')}</TableCell>
-                                                                            <TableCell className="border p-1">RVSP</TableCell>
-                                                                            <TableCell className="border p-1">{renderInputField('mvsp', '', 'number', '')}</TableCell>
+                                                                            <TableCell className="border p-1">NRVC</TableCell>
+                                                                            <TableCell className="border p-1">{renderInputField('nrvc', '', 'number', '')}</TableCell>
                                                                             <TableCell className="border p-1"> </TableCell>
                                                                             <TableCell className="border p-1"> </TableCell>
                                                                         </TableRow>

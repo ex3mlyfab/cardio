@@ -54,8 +54,10 @@ export default function ShowTest({ testRecord }: {
         e_lat: number;
         a_wave: number;
         a_lat: number;
+        e_ave: number;
+        lavi: number;
+        pulmonary_vein_sd: number;
         e_a: number;
-        s_lat: number;
         e_wave_dt: number;
         e_e: number;
         ivrt: number;
@@ -67,8 +69,6 @@ export default function ShowTest({ testRecord }: {
         triscupid_regurg_press: string;
         mitral_regurg_peak: string;
         mitral_regurg_press: string;
-        aortic_regurg_peak: string;
-        aortic_regurg_press: string;
         mitral_stenosis: string;
         inferior_vena_cava_insp: string;
         inferior_vena_cava_expi: string;
@@ -76,8 +76,10 @@ export default function ShowTest({ testRecord }: {
         est_right: string;
         pericardium: string;
         pasp: string;
-        mvsp: string;
         mpap: string;
+        arpht: string;
+        arvc: string;
+        nrvc: string;
         summary: string;
         sign: string;
         conclusion: string;
@@ -367,25 +369,30 @@ export default function ShowTest({ testRecord }: {
                                     <TableCell className="border p-1">E/A</TableCell>
                                     <TableCell className="border p-1"></TableCell>
                                     <TableCell className="border p-1">{testRecord.e_a}</TableCell>
-                                    <TableCell className="border p-1">S' (lat)(m/s)</TableCell>
+                                    <TableCell className="border p-1">E' (ave)(m/s)</TableCell>
                                     <TableCell className="border p-1"></TableCell>
-                                    <TableCell className="border p-1">{testRecord.s_lat}</TableCell>
+                                    <TableCell className="border p-1">{testRecord.e_ave}</TableCell>
                                 </TableRow>
                                 <TableRow>
                                     <TableCell className="border p-1">E wave DT(m/s)</TableCell>
                                     <TableCell className="border p-1"></TableCell>
                                     <TableCell className="border p-1">{testRecord.e_wave_dt}</TableCell>
-                                    <TableCell className="border p-1">E/E'</TableCell>
-                                    <TableCell className="border p-1">&le;15</TableCell>
-                                    <TableCell className="border p-1">{testRecord.e_e}</TableCell>
+                                    <TableCell className="border p-1">LAVI(ml/m2)</TableCell>
+                                    <TableCell className="border p-1"></TableCell>
+                                    <TableCell className="border p-1">{testRecord.lavi}</TableCell>
                                 </TableRow>
                                 <TableRow>
                                     <TableCell className="border p-1">IVRT(m/s)</TableCell>
                                     <TableCell className="border p-1"></TableCell>
                                     <TableCell className="border p-1">{testRecord.ivrt}</TableCell>
+                                    <TableCell className="border p-1">Pulmonary vein (S/D)</TableCell>
                                     <TableCell className="border p-1"></TableCell>
-                                    <TableCell className="border p-1"></TableCell>
-                                    <TableCell className="border p-1"></TableCell>
+                                    <TableCell className="border p-1">{testRecord.pulmonary_vein_sd}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell className="border p-1">E/E'</TableCell>
+                                    <TableCell className="border p-1">&le;15</TableCell>
+                                    <TableCell className="border p-1">{testRecord.e_e}</TableCell>
                                 </TableRow>
                             </TableBody>
                         </Table>
@@ -422,10 +429,10 @@ export default function ShowTest({ testRecord }: {
                                 <TableRow>
                                     <TableCell className="border p-1">MR<sub>max</sub>PG</TableCell>
                                     <TableCell className="border p-1">{testRecord.mitral_regurg_press}</TableCell>
-                                    <TableCell className="border p-1">ARV<sub>max</sub></TableCell>
-                                    <TableCell className="border p-1">{testRecord.aortic_regurg_peak}</TableCell>
-                                    <TableCell className="border p-1">AR<sub>max</sub>PG</TableCell>
-                                    <TableCell className="border p-1">{testRecord.aortic_regurg_press}</TableCell>
+                                    <TableCell className="border p-1">ARPHT(ms)</TableCell>
+                                    <TableCell className="border p-1">{testRecord.arpht}</TableCell>
+                                    <TableCell className="border p-1">ARVC</TableCell>
+                                    <TableCell className="border p-1">{testRecord.arvc}</TableCell>
                                 </TableRow>
                                 <TableRow>
                                     <TableCell className="border p-1">Mitral Stenosis (valve Area)</TableCell>
@@ -446,8 +453,8 @@ export default function ShowTest({ testRecord }: {
                                 <TableRow>
                                     <TableCell className="border p-1">MPAP</TableCell>
                                     <TableCell className="border p-1">{testRecord.mpap}</TableCell>
-                                    <TableCell className="border p-1">RVSP</TableCell>
-                                    <TableCell className="border p-1">{testRecord.mvsp}</TableCell>
+                                    <TableCell className="border p-1">NRVC</TableCell>
+                                    <TableCell className="border p-1">{testRecord.nrvc}</TableCell>
                                     <TableCell className="border p-1"></TableCell>
                                     <TableCell className="border p-1"></TableCell>
                                 </TableRow>

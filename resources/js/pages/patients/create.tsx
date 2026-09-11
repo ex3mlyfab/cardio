@@ -77,7 +77,9 @@ export default function CreatePatientPage() {
         e_wave_dt: '',
         e_lat: '',
         a_lat: '',
-        s_lat: '',
+        e_ave: '',
+        lavi: '',
+        pulmonary_vein_sd: '',
         e_e: '',
         ivrt: '',
 
@@ -90,15 +92,15 @@ export default function CreatePatientPage() {
         triscupid_regurg_press: '',
         mitral_regurg_peak: '',
         mitral_regurg_press: '',
-        aortic_regurg_peak: '',
-        aortic_regurg_press: '',
         mitral_stenosis: '',
         inferior_vena_cava_insp: '',
         inferior_vena_cava_expi: '',
         inferior_vena_cava_diam: '',
         pasp: '',
         mpap: '',
-        mvsp: '',
+        arpht: '',
+        arvc: '',
+        nrvc: '',
         est_right: '',
         pericardium: '',
         summary: '',
@@ -145,13 +147,13 @@ export default function CreatePatientPage() {
     };
     const handleRVSPCalc: FocusEventHandler<HTMLInputElement> = async () => {
         if (data.triscupid_regurg_peak) {
-            const rvsp = Math.pow(Number(data.triscupid_regurg_peak), 2);
-            setData('mvsp', rvsp.toFixed(2));
+            const nrvc = Math.pow(Number(data.triscupid_regurg_peak), 2);
+            setData('nrvc', nrvc.toFixed(2));
         }
     }
     const handlePASPCalc: FocusEventHandler<HTMLInputElement> = async () => {
-        if (data.mvsp && data.est_right) {
-            const pasp = Number(data.mvsp) + Number(data.est_right);
+        if (data.nrvc && data.est_right) {
+            const pasp = Number(data.nrvc) + Number(data.est_right);
             setData('pasp', pasp.toFixed(2));
             const mpap = (0.61 * Number(data.pasp)) + 2;
             setData('mpap', mpap.toFixed(2));
@@ -169,7 +171,7 @@ export default function CreatePatientPage() {
         }
     ) => (
         <div className="grid gap-2">
-            <Label htmlFor={id}>{label}</Label>
+            {label ? <Label htmlFor={id} className="text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">{label}</Label> : null}
             <Input
                 id={id}
                 name={id}
@@ -177,29 +179,29 @@ export default function CreatePatientPage() {
                 value={data[id]}
                 onChange={(e) => setData(id, e.target.value)}
                 placeholder={placeholder || label}
-                className="mt-1 block w-full"
+                className="mt-1 block w-full rounded-xl border border-input bg-background px-3 py-2 text-sm shadow-none transition-colors focus-visible:border-ring"
                 autoFocus={config?.autoFocus}
                 readOnly={id === 'bsa'}
                 onBlur={config?.onBlur}
                 onKeyDown={handleKeyDown}
             />
-            <InputError message={errors[id]} className="mt-2" />
+            <InputError message={errors[id]} className="mt-1 text-xs" />
         </div>
     );
 
     const renderTextareaField = (id: keyof typeof data, label: string, placeholder?: string) => (
         <div className="grid gap-2">
-            <Label htmlFor={id}>{label}</Label>
+            <Label htmlFor={id} className="text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">{label}</Label>
             <Textarea
                 id={id}
                 name={id}
                 value={data[id]}
                 onChange={(e) => setData(id, e.target.value)}
                 placeholder={placeholder || label}
-                className="mt-1 block w-full"
+                className="mt-1 block w-full rounded-xl border border-input bg-background px-3 py-2 text-sm shadow-none transition-colors focus-visible:border-ring"
                 onKeyDown={handleKeyDown}
             />
-            <InputError message={errors[id]} className="mt-2" />
+            <InputError message={errors[id]} className="mt-1 text-xs" />
         </div>
     );
 
@@ -218,26 +220,25 @@ export default function CreatePatientPage() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Patient and Test Record" />
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                {/*show all validation errors */}
-                               {Object.keys(errors).length > 0 && (
-                                   <div className="mb-4 rounded-lg bg-red-100 p-4 text-red-700">
-                                       <ul className="list-disc space-y-1 pl-5">
-                                           {Object.values(errors).map((error, index) => (
-                                               <li key={index}>{error}</li>
-                                           ))}
-                                       </ul>
-                                   </div>
-                               )}
-                {/* Form Container */}
-                <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl border p-4 md:p-6">
+            <div className="flex h-full flex-1 flex-col gap-4 rounded-[1.25rem] p-3 md:p-5">
+                {Object.keys(errors).length > 0 && (
+                    <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 shadow-sm">
+                        <ul className="list-disc space-y-1 pl-5">
+                            {Object.values(errors).map((error, index) => (
+                                <li key={index}>{error}</li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+
+                <div className="relative flex-1 overflow-hidden rounded-[1.25rem] border border-border/80 bg-card p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_12px_30px_rgba(15,23,42,0.04)] md:p-6">
                     <form onSubmit={submit} className="space-y-8" onKeyDown={handleKeyDown}>
                         <Tabs defaultValue="patient-details" className="w-full">
-                            <TabsList className="mb-4 w-full justify-start">
-                                <TabsTrigger value="patient-details">Initial Info</TabsTrigger>
-                                <TabsTrigger value="dimensions">Dimensions</TabsTrigger>
-                                <TabsTrigger value="diastolic-function">Diastolic Function</TabsTrigger>
-                                <TabsTrigger value="report">Report</TabsTrigger>
+                            <TabsList className="mb-4 w-full justify-start rounded-xl bg-muted p-1">
+                                <TabsTrigger value="patient-details" className="rounded-lg px-3 py-2 text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm">Initial Info</TabsTrigger>
+                                <TabsTrigger value="dimensions" className="rounded-lg px-3 py-2 text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm">Dimensions</TabsTrigger>
+                                <TabsTrigger value="diastolic-function" className="rounded-lg px-3 py-2 text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm">Diastolic Function</TabsTrigger>
+                                <TabsTrigger value="report" className="rounded-lg px-3 py-2 text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm">Report</TabsTrigger>
                             </TabsList>
 
                             {/* Patient Details Tab */}
@@ -248,12 +249,11 @@ export default function CreatePatientPage() {
                                         <Table className="border">
                                             <TableHeader>
                                                 <TableRow>
-                                                    <TableHead className="border p-2">Hospital No</TableHead>
-                                                    <TableHead className="border p-2">Surname</TableHead>
-                                                    <TableHead className="border p-2">Other Names</TableHead>
-                                                    <TableHead className="w-[100px] border p-2">Sex</TableHead>
-                                                    <TableHead className="border p-2" colSpan={2}>DOB</TableHead>
-                                                    
+                                                    <TableHead className="border bg-muted/50 p-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">Hospital No</TableHead>
+                                                    <TableHead className="border bg-muted/50 p-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">Surname</TableHead>
+                                                    <TableHead className="border bg-muted/50 p-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">Other Names</TableHead>
+                                                    <TableHead className="w-[100px] border bg-muted/50 p-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">Sex</TableHead>
+                                                    <TableHead className="border bg-muted/50 p-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground" colSpan={2}>DOB</TableHead>
                                                 </TableRow>
                                             </TableHeader>
                                             <TableBody>
@@ -442,8 +442,17 @@ export default function CreatePatientPage() {
                                             <TableCell className="border p-1"> IVRT(m/s)</TableCell>
                                             <TableCell className="border p-1"> {renderInputField('ivrt', '', 'number', '')}</TableCell>
 
-                                            <TableCell className="border p-1"> S' (lat)(m/s)</TableCell>
-                                            <TableCell className="border p-1"> {renderInputField('s_lat', '', 'number', '')}</TableCell>
+                                        </TableRow>
+
+                                        <TableRow>
+                                            <TableCell className="border p-1"> E' (ave)(m/s)</TableCell>
+                                            <TableCell className="border p-1">
+                                                {renderInputField('e_ave', '', 'number', '')}
+                                            </TableCell>
+                                            <TableCell className="border p-1"> LAVI(ml/m<sup>2</sup>)</TableCell>
+                                            <TableCell className="border p-1"> {renderInputField('lavi', '', 'number', '')}</TableCell>
+                                            <TableCell className="border p-1"> Pulmonary vein (S/D)</TableCell>
+                                            <TableCell className="border p-1"> {renderInputField('pulmonary_vein_sd', '', 'number', '')}</TableCell>
                                         </TableRow>
 
                                         <TableRow>
@@ -537,16 +546,16 @@ export default function CreatePatientPage() {
                                                     {renderInputField('mitral_regurg_press', '', 'number', '')}
                                                 </TableCell>
                                                 <TableCell className="border p-1">
-                                                    ARV<sub>max</sub>
+                                                    ARPHT(ms)
                                                 </TableCell>
                                                 <TableCell className="border p-1">
-                                                    {renderInputField('aortic_regurg_peak', '', 'number', '')}
+                                                    {renderInputField('arpht', '', 'number', '')}
                                                 </TableCell>
                                                 <TableCell className="border p-1">
-                                                    AR<sub>max</sub>PG
+                                                    ARVC
                                                 </TableCell>
                                                 <TableCell className="border p-1">
-                                                    {renderInputField('aortic_regurg_press', '', 'number', '')}
+                                                    {renderInputField('arvc', '', 'number', '')}
                                                 </TableCell>
                                             </TableRow>
                                             <TableRow>
@@ -584,8 +593,8 @@ export default function CreatePatientPage() {
                                             <TableRow>
                                                 <TableCell className="border p-1">MPAP</TableCell>
                                                 <TableCell className="border p-1">{renderInputField('mpap', '', 'number', '')}</TableCell>
-                                                <TableCell className="border p-1">RVSP</TableCell>
-                                                <TableCell className="border p-1">{renderInputField('mvsp', '', 'number', '')}</TableCell>
+                                                <TableCell className="border p-1">NRVC</TableCell>
+                                                <TableCell className="border p-1">{renderInputField('nrvc', '', 'number', '')}</TableCell>
                                                 <TableCell className="border p-1"> </TableCell>
                                                 <TableCell className="border p-1"> </TableCell>
                                             </TableRow>

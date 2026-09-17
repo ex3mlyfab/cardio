@@ -145,6 +145,12 @@ export default function CreatePatientPage() {
             setData('e_e', e_e.toFixed(2));
         }
     };
+    const handleTRCalc: FocusEventHandler<HTMLInputElement> = async () => {
+        if (data.triscupid_regurg_peak && data.inferior_vena_cava_diam && data.inferior_vena_cava_insp && data.inferior_vena_cava_expi) {
+            const tr = Number(data.triscupid_regurg_peak) * 4;
+            setData('triscupid_regurg_press', tr.toFixed(2));
+        }
+    }
     const handleRVSPCalc: FocusEventHandler<HTMLInputElement> = async () => {
         if (data.triscupid_regurg_peak) {
             const nrvc = Math.pow(Number(data.triscupid_regurg_peak), 2);
@@ -152,8 +158,8 @@ export default function CreatePatientPage() {
         }
     }
     const handlePASPCalc: FocusEventHandler<HTMLInputElement> = async () => {
-        if (data.nrvc && data.est_right) {
-            const pasp = Number(data.nrvc) + Number(data.est_right);
+        if (data.triscupid_regurg_peak && data.triscupid_regurg_press && data.inferior_vena_cava_diam) {
+            const pasp = Number(data.triscupid_regurg_press) + Number(data.inferior_vena_cava_diam);
             setData('pasp', pasp.toFixed(2));
             const mpap = (0.61 * Number(data.pasp)) + 2;
             setData('mpap', mpap.toFixed(2));
@@ -281,11 +287,11 @@ export default function CreatePatientPage() {
                                                                     <SelectItem value="female">Female</SelectItem>
                                                                 </SelectContent>
                                                             </Select>
-                                            <InputError message={errors.pericardium} className="mt-2" />
+                                                            <InputError message={errors.pericardium} className="mt-2" />
                                                         </div>
                                                     </TableCell>
                                                     <TableCell className="border p-2" colSpan={2}> {renderInputField('date_of_birth', '', 'date')}</TableCell>
-                                                   
+
                                                 </TableRow>
                                             </TableBody>
                                         </Table>
@@ -301,12 +307,12 @@ export default function CreatePatientPage() {
                                                 <TableHead className="border p-2">
                                                     BSA(m<sup>2</sup>)
                                                 </TableHead>
-                                               
+
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
                                             <TableRow>
-                                                 <TableCell className="border p-2">{renderInputField('nicl', '')}</TableCell>
+                                                <TableCell className="border p-2">{renderInputField('nicl', '')}</TableCell>
                                                 <TableCell className="border p-2">{renderInputField('test_date', '', 'date')}</TableCell>
                                                 <TableCell className="border p-2">
                                                     {' '}
@@ -322,7 +328,7 @@ export default function CreatePatientPage() {
                                                     })}
                                                 </TableCell>
                                                 <TableCell className="border p-2"> {renderInputField('bsa', '')}</TableCell>
-                                                
+
                                             </TableRow>
                                         </TableBody>
                                     </Table>
@@ -389,7 +395,7 @@ export default function CreatePatientPage() {
                                             <TableCell className="border p-1"> IVSS</TableCell>
                                             <TableCell className="border p-1"> {renderInputField('ivss', '', 'number', 'IVSS')}</TableCell>
                                         </TableRow>
-                                        
+
                                         <TableRow>
                                             <TableCell className="border p-1">LVIDs</TableCell>
                                             <TableCell className="border p-1"> {renderInputField('lvids', '', 'number', 'LVIDs')}</TableCell>
@@ -518,7 +524,9 @@ export default function CreatePatientPage() {
                                                     TRV<sub>max</sub>
                                                 </TableCell>
                                                 <TableCell className="border p-1">
-                                                    {renderInputField('triscupid_regurg_peak', '', 'number')}
+                                                    {renderInputField('triscupid_regurg_peak', '', 'number', '', {
+                                                        onBlur: handleTRCalc,
+                                                    })}
                                                 </TableCell>
                                                 <TableCell className="border p-1">
                                                     TR<sub>max</sub>PG
@@ -579,13 +587,13 @@ export default function CreatePatientPage() {
                                                     IVC<sub>(diameter with valva manoeuvre)</sub>
                                                 </TableCell>
                                                 <TableCell className="border p-1">
-                                                    {renderInputField('inferior_vena_cava_diam', '', 'number', '')}
+                                                    {renderInputField('inferior_vena_cava_diam', '', 'number', '', {
+                                                        onBlur: handlePASPCalc,
+                                                    })}
                                                 </TableCell>
                                                 <TableCell className="border p-1">Est. Right Aterial pressure</TableCell>
                                                 <TableCell className="border p-1">
-                                                    {renderInputField('est_right', '', 'number', '', {
-                                                        onBlur: handlePASPCalc,
-                                                    })}
+                                                    {renderInputField('est_right', '', 'number')}
                                                 </TableCell>
                                                 <TableCell className="border p-1">PASP</TableCell>
                                                 <TableCell className="border p-1">{renderInputField('pasp', '', 'number', '')}</TableCell>
@@ -593,7 +601,7 @@ export default function CreatePatientPage() {
                                             <TableRow>
                                                 <TableCell className="border p-1">MPAP</TableCell>
                                                 <TableCell className="border p-1">{renderInputField('mpap', '', 'number', '')}</TableCell>
-                                                <TableCell className="border p-1">NRVC</TableCell>
+                                                <TableCell className="border p-1">NR<sub>VC</sub></TableCell>
                                                 <TableCell className="border p-1">{renderInputField('nrvc', '', 'number', '')}</TableCell>
                                                 <TableCell className="border p-1"> </TableCell>
                                                 <TableCell className="border p-1"> </TableCell>
@@ -649,11 +657,14 @@ export default function CreatePatientPage() {
                                         <InputError message={errors.sign} className="mt-2" />
                                     </div>
                                 </div>
-                                <Button type="submit" disabled={processing} className="mt-4">
-                                    Create Test Record
-                                </Button>
+
                             </TabsContent>
                         </Tabs>
+                        <div className="flex justify-end">
+                            <Button type="submit" disabled={processing} className="mt-4">
+                                Create Test Record
+                            </Button>
+                        </div>
                     </form>
                 </div>
             </div>

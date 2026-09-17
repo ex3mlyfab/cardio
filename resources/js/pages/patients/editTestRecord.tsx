@@ -701,11 +701,14 @@ export default function EditTestRecordPage({ data: testRecord }: { data: {
                                                                     <InputError message={errors.sign} className="mt-2" />
                                                                 </div>
                                                             </div>
-                                                            <Button type="submit" disabled={processing} className="mt-4">
-                                                                Create Test Record
-                                                            </Button>
+                                                            
                                                         </TabsContent>
                         </Tabs>
+                        <div className='flex items-center justify-center w-full mt-4'>
+                        <Button type="submit" disabled={processing} className="mt-4">
+                                                                Update Test Record
+                        </Button>
+                        </div>
                     </form>
                 </div>
             </div>
